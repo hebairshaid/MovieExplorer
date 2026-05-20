@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movieexplorer"
+    namespace = "com.movieexplorer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.movieexplorer"
+        applicationId = "com.movieexplorer"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -70,6 +70,10 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
 
     // Tests
     testImplementation(libs.junit)
