@@ -29,7 +29,7 @@ fun MovieDetailsScreen(
 
         when {
 
-            state.isLoading -> {
+            state.isLoading || (state.movie == null && state.error == null) -> {
                 CircularProgressIndicator()
             }
 
@@ -43,12 +43,8 @@ fun MovieDetailsScreen(
                 }
             }
 
-            state.error != null -> {
-                Text(text = "Error: ${state.error}")
-            }
-
             else -> {
-                Text(text = "No movie found")
+                Text(text = "Error: ${state.error}")
             }
         }
     }
