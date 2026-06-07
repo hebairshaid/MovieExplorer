@@ -6,5 +6,6 @@ data class MovieDetailDto(
     val overview: String,
     val poster_path: String?,
     val vote_average: Double,
-    val release_date: String
+    val release_date: String,
+    val runtime: Int
 )

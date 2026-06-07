@@ -132,6 +132,10 @@ fun MovieScreen(
                                 println("🔥 CLICKED MOVIE ID = ${movie.id}")
                                 println("🚀 NAVIGATING WITH ID = ${movie.id}")
 
+                                navController.currentBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("genre", tabs[selectedTab])
+
                                 navController.navigate(
                                     "movie_details/${movie.id}"   // ✅ SAFE STRING ROUTE
                                 )

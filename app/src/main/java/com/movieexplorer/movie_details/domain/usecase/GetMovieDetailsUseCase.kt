@@ -1,6 +1,5 @@
 package com.movieexplorer.movie_details.domain.usecase
 
-import com.movieexplorer.home_screen.domain.model.Movie
 import com.movieexplorer.movie_details.domain.repository.MovieDetailRepository
 
 class GetMovieDetailsUseCase(

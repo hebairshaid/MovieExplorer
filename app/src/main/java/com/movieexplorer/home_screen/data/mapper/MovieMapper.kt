@@ -10,6 +10,7 @@ fun MovieDto.toMovie(): Movie {
         posterUrl = "https://image.tmdb.org/t/p/w500${poster_path ?: ""}",
         rating = vote_average ?: 0.0,
         releaseDate = release_date ?: "",
-        overview = overview ?: ""
+        overview = overview ?: "",
+        runtime = 0
     )
 }

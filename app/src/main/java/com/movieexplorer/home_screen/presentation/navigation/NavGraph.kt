@@ -1,6 +1,7 @@
 package com.movieexplorer.home_screen.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,10 +16,10 @@ import com.movieexplorer.home_screen.presentation.home.MovieScreen
 
 import com.movieexplorer.movie_details.data.remote.MovieDetailApiInstance
 import com.movieexplorer.movie_details.data.repository.MovieDetailRepositoryImpl
-import com.movieexplorer.movie_details.domain.repository.MovieDetailRepository
 import com.movieexplorer.movie_details.domain.usecase.GetMovieDetailsUseCase
 import com.movieexplorer.movie_details.presentation.MovieDetailsScreen
 import com.movieexplorer.movie_details.presentation.MovieDetailsViewModel
+import com.movieexplorer.movie_details.presentation.MovieDetailsViewModelFactory
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -28,7 +29,6 @@ fun NavGraph(navController: NavHostController) {
         startDestination = "home"
     ) {
 
-        //  HOME SCREEN
         composable("home") {
 
             val api = MovieApiInstance.api
@@ -43,32 +43,27 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // MOVIE DETAILS SCREEN
         composable(
             route = "movie_details/{movieId}",
             arguments = listOf(
-                navArgument("movieId") {
-                    type = NavType.IntType
-                }
+                navArgument("movieId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
 
             val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
 
-            println("📺 SCREEN OPENED movieId = $movieId")
-
-            val api = MovieDetailApiInstance.api
-
-            val repository: MovieDetailRepository =
-                MovieDetailRepositoryImpl(api)
-
-            val useCase = GetMovieDetailsUseCase(repository)
-
-            val viewModel = MovieDetailsViewModel(useCase)
+            val viewModel: MovieDetailsViewModel = viewModel(
+                factory = MovieDetailsViewModelFactory(
+                    GetMovieDetailsUseCase(
+                        MovieDetailRepositoryImpl(MovieDetailApiInstance.api)
+                    )
+                )
+            )
 
             MovieDetailsScreen(
                 movieId = movieId,
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navController
             )
         }
     }

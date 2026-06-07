@@ -6,9 +6,10 @@ fun MovieDetailDto.toDomain(): Movie {
     return Movie(
         id = id,
         title = title,
-        overview = overview ?: "",
+        overview = overview,
         posterUrl = poster_path ?: "",
         rating = vote_average,
-        releaseDate = release_date ?: ""
+        releaseDate = release_date,
+        runtime = runtime
     )
 }
