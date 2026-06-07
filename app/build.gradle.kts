@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movieexplorer"
+    namespace = "com.movieexplorer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.movieexplorer"
+        applicationId = "com.movieexplorer"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -52,9 +52,15 @@ android {
 
 dependencies {
 
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // Core Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation(libs.androidx.activity.compose)
 
     // Compose BOM (controls all Compose versions)
@@ -70,6 +76,12 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
+
+
 
     // Tests
     testImplementation(libs.junit)
