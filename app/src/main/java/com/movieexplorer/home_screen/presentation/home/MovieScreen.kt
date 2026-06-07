@@ -13,11 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.movieexplorer.home_screen.presentation.navigation.Screen
 import com.movieexplorer.ui.theme.DarkBlue
 import com.movieexplorer.ui.theme.Gold
 
 @Composable
-fun MovieScreen(viewModel: HomeViewModel) {
+fun MovieScreen(
+    viewModel: HomeViewModel,
+    navController: NavController
+) {
 
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -35,6 +40,7 @@ fun MovieScreen(viewModel: HomeViewModel) {
             .background(DarkBlue)
     ) {
 
+        // 🎬 Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -42,10 +48,7 @@ fun MovieScreen(viewModel: HomeViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(
-                text = "🎬",
-                fontSize = 28.sp
-            )
+            Text(text = "🎬", fontSize = 28.sp)
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -53,10 +56,10 @@ fun MovieScreen(viewModel: HomeViewModel) {
                 text = "Movie Explorer",
                 color = Color.White,
                 fontSize = 28.sp
-
             )
         }
 
+        // 📌 Tabs
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = DarkBlue,
@@ -96,6 +99,7 @@ fun MovieScreen(viewModel: HomeViewModel) {
             }
         }
 
+        // 📊 Content
         when {
 
             state.isLoading -> {
@@ -119,9 +123,19 @@ fun MovieScreen(viewModel: HomeViewModel) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(state.movies) { movie ->
+
                         MovieCard(
                             movie = movie,
-                            genre = tabs[selectedTab]
+                            genre = tabs[selectedTab],
+                            onClick = {
+
+                                println("🔥 CLICKED MOVIE ID = ${movie.id}")
+                                println("🚀 NAVIGATING WITH ID = ${movie.id}")
+
+                                navController.navigate(
+                                    "movie_details/${movie.id}"   // ✅ SAFE STRING ROUTE
+                                )
+                            }
                         )
                     }
                 }
@@ -129,6 +143,3 @@ fun MovieScreen(viewModel: HomeViewModel) {
         }
     }
 }
-
-
-

@@ -1,5 +1,6 @@
 package com.movieexplorer.home_screen.presentation.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -19,13 +20,21 @@ import com.movieexplorer.ui.theme.Gold
 @Composable
 fun MovieCard(
     movie: Movie,
-    genre: String
+    genre: String,
+    onClick: () -> Unit
 ) {
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 6.dp),
+            .padding(horizontal = 14.dp, vertical = 6.dp)
+            .clickable {
+
+                // ✅ HERE IS THE CORRECT PLACE
+                println("🔥 CLICKED MOVIE ID = ${movie.id}")
+
+                onClick()
+            },
         colors = CardDefaults.cardColors(
             containerColor = CardBlue
         ),
@@ -38,7 +47,7 @@ fun MovieCard(
         ) {
 
             AsyncImage(
-                model = "https://image.tmdb.org/t/p/w500${movie.posterPath}",
+                model = "https://image.tmdb.org/t/p/w500${movie.posterUrl}",
                 contentDescription = movie.title,
                 modifier = Modifier
                     .width(95.dp)
@@ -52,7 +61,6 @@ fun MovieCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
-                // TITLE
                 Text(
                     text = movie.title,
                     color = Color.White,
@@ -63,8 +71,9 @@ fun MovieCard(
 
                 Spacer(modifier = Modifier.height(2.dp))
 
-                // ⭐ RATING (WHITE + GRAY /10)
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Text(
                         text = "⭐ ${movie.rating}",
@@ -78,7 +87,6 @@ fun MovieCard(
                         fontSize = 12.sp
                     )
                 }
-
 
                 Spacer(modifier = Modifier.height(60.dp))
 
