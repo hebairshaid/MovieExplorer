@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.movieexplorer.home_screen.domain.model.Movie
-import com.movieexplorer.home_screen.presentation.navigation.Screen
+import com.movieexplorer.navigation.Screen
 
 @Composable
 fun MovieItem(

@@ -1,4 +1,4 @@
-package com.movieexplorer.home_screen.presentation.navigation
+package com.movieexplorer.navigation
 
 object Screen {
 

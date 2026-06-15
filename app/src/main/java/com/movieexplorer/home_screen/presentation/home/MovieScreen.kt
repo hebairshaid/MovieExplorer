@@ -11,17 +11,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.movieexplorer.home_screen.presentation.navigation.Screen
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.compose.*
+import com.movieexplorer.R
 import com.movieexplorer.ui.theme.DarkBlue
 import com.movieexplorer.ui.theme.Gold
 
 @Composable
 fun MovieScreen(
     viewModel: HomeViewModel,
-    navController: NavController
+    navController: NavController,
+    onLogout: () -> Unit
 ) {
 
     var selectedTab by remember { mutableStateOf(0) }
@@ -34,38 +38,80 @@ fun MovieScreen(
 
     val tabs = listOf("Action", "Comedy", "Adventure")
 
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.splash)
+    )
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition
+    )
+
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR,
+            value = Gold.toArgb(),
+            keyPath = arrayOf("**", "Fill 1")
+        ),
+        rememberLottieDynamicProperty(
+            property = LottieProperty.STROKE_COLOR,
+            value = Gold.toArgb(),
+            keyPath = arrayOf("**", "Stroke 1")
+        )
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBlue)
     ) {
 
-        // 🎬 Header
+        // HEADER
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 20.dp),
+                .padding(
+                    top = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(text = "🎬", fontSize = 28.sp)
+            LottieAnimation(
+                composition = composition,
+                progress = progress,
+                dynamicProperties = dynamicProperties,
+                modifier = Modifier.size(50.dp)
+            )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = "Movie Explorer",
                 color = Color.White,
-                fontSize = 28.sp
+                fontSize = 24.sp
             )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = onLogout,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Gold,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text("Logout")
+            }
         }
 
-        // 📌 Tabs
+        // TABS
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = DarkBlue,
             contentColor = Gold,
             indicator = { tabPositions ->
-
                 Box(
                     modifier = Modifier
                         .tabIndicatorOffset(tabPositions[selectedTab])
@@ -99,29 +145,40 @@ fun MovieScreen(
             }
         }
 
-        // 📊 Content
+        // CONTENT
         when {
 
             state.isLoading -> {
+
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Gold)
+                    CircularProgressIndicator(
+                        color = Gold
+                    )
                 }
             }
 
             state.error != null -> {
-                Text(
-                    text = state.error ?: "",
-                    color = Color.White
-                )
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = state.error ?: "",
+                        color = Color.White
+                    )
+                }
             }
 
             else -> {
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
+
                     items(state.movies) { movie ->
 
                         MovieCard(
@@ -130,14 +187,13 @@ fun MovieScreen(
                             onClick = {
 
                                 println("🔥 CLICKED MOVIE ID = ${movie.id}")
-                                println("🚀 NAVIGATING WITH ID = ${movie.id}")
 
                                 navController.currentBackStackEntry
                                     ?.savedStateHandle
                                     ?.set("genre", tabs[selectedTab])
 
                                 navController.navigate(
-                                    "movie_details/${movie.id}"   // ✅ SAFE STRING ROUTE
+                                    "movie_details/${movie.id}"
                                 )
                             }
                         )

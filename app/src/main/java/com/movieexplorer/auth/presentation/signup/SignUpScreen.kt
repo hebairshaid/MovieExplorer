@@ -66,7 +66,7 @@ fun SignUpScreen(
             horizontalAlignment = Alignment.Start
         ) {
 
-            // 🔥 CENTER TITLE
+            //  CENTER TITLE
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -80,8 +80,10 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // 👤 NAME
+            //  NAME
             Text("Name", color = Gold,fontSize = 20.sp)
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             TextField(
                 value = state.name,
@@ -95,6 +97,8 @@ fun SignUpScreen(
             // 📧 EMAIL
             Text("Email", color = Gold,fontSize = 20.sp)
 
+            Spacer(modifier = Modifier.height(10.dp))
+
             TextField(
                 value = state.email,
                 onValueChange = viewModel::onEmailChange,
@@ -107,6 +111,8 @@ fun SignUpScreen(
             // 🔒 PASSWORD
             Text("Password", color = Gold,fontSize = 20.sp)
 
+            Spacer(modifier = Modifier.height(10.dp))
+
             TextField(
                 value = state.password,
                 onValueChange = viewModel::onPasswordChange,
@@ -114,9 +120,11 @@ fun SignUpScreen(
                 label = { Text("Enter password") }
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text("Confirm Password", color = Gold,fontSize = 20.sp)
+
+            Spacer(modifier = Modifier.height(10.dp))
 
 
             TextField(
@@ -126,7 +134,7 @@ fun SignUpScreen(
                 label = { Text("Confirm Password") }
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             // 🔘 CENTER BUTTON
             Box(
