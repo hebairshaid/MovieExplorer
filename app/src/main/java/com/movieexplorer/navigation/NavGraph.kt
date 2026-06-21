@@ -19,24 +19,89 @@ import com.movieexplorer.home_screen.presentation.home.MovieScreen
 
 import com.movieexplorer.movie_details.presentation.MovieDetailsScreen
 import com.movieexplorer.movie_details.presentation.MovieDetailsViewModel
-import com.movieexplorer.movie_details.presentation.MovieDetailsViewModelFactory
 
 import com.movieexplorer.splash_screen.SplashScreenUI
 import com.movieexplorer.splash_screen.SplashViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun NavGraph(
-    navController: NavHostController,
-    splashViewModel: SplashViewModel,
-    loginViewModel: LoginViewModel,
-    signUpViewModel: SignUpViewModel,
-    homeViewModel: HomeViewModel,
-    movieDetailsFactory: MovieDetailsViewModelFactory
-) {
-
+fun NavGraph( //This is a function that defines all screens in your app and how to navigate between them
+navController: NavHostController
+){
     NavHost(
         navController = navController,
         startDestination = "splash"
+    ) {
+
+        // 🔵 SPLASH
+        composable("splash") {
+            SplashScreenUI(
+                onNavigateToLogin = {
+                    navController.navigate("login") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                },
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // 🔵 LOGIN
+        composable("login") {
+            LoginScreen(
+                onNavigateToSignUp = {
+                    navController.navigate("signup")
+                },
+                onLoginSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // 🔵 HOME
+        composable("home") {
+            MovieScreen(
+                navController = navController,
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // 🔵 SIGNUP
+        composable("signup") {
+            SignUpScreen(
+                onNavigate = {
+                    navController.navigate("login") {
+                        popUpTo("signup") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // 🔵 MOVIE DETAILS
+        composable(
+            route = "movie_details/{movieId}",
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+        ) {
+            MovieDetailsScreen(
+                navController = navController,
+                movieId = it.arguments?.getInt("movieId") ?: 0
+            )
+        }
+    }
+}
+
+   /* NavHost( // container for all screens
+        navController = navController,
+        startDestination = "splash" //first screen when app open
     ) {
 
         composable("splash") {
@@ -44,7 +109,7 @@ fun NavGraph(
                 viewModel = splashViewModel,
                 onNavigateToLogin = {
                     navController.navigate("login") {
-                        popUpTo("splash") { inclusive = true }
+                        popUpTo("splash") { inclusive = true } //Removes splash from back stack So user cannot go back to it
                     }
                 },
                 onNavigateToHome = {
@@ -80,7 +145,7 @@ fun NavGraph(
                     }
                 }
             )
-        } // ✅ IMPORTANT FIX: closing home block
+        } // IMPORTANT FIX: closing home block
 
         composable("signup") {
             SignUpScreen(
@@ -89,14 +154,14 @@ fun NavGraph(
         }
 
         composable(
-            route = "movie_details/{movieId}",
-            arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+            route = "movie_details/{movieId}", //This is a dynamic route it accept an id
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType }) //movie id must be int
         ) { backStackEntry ->
 
-            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
+            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0 //If no value → default = 0
 
-            val movieDetailsViewModel: MovieDetailsViewModel =
-                viewModel(factory = movieDetailsFactory)
+            val movieDetailsViewModel: MovieDetailsViewModel =  //This creates ViewModel using factory
+                viewModel(factory = movieDetailsFactory)        //this when a view model need a parameter
 
             MovieDetailsScreen(
                 movieId = movieId,
@@ -106,3 +171,4 @@ fun NavGraph(
         }
     }
 }
+*/

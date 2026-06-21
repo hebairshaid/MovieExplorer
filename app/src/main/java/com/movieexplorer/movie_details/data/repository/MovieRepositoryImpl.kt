@@ -4,8 +4,9 @@ import com.movieexplorer.movie_details.data.remote.MovieDetailApi
 import com.movieexplorer.movie_details.data.mapper.toDomain
 import com.movieexplorer.movie_details.domain.repository.MovieDetailRepository
 import com.movieexplorer.home_screen.domain.model.Movie
+import javax.inject.Inject
 
-class MovieDetailRepositoryImpl(
+class MovieDetailRepositoryImpl @Inject constructor(
     private val api: MovieDetailApi
 ) : MovieDetailRepository {
 

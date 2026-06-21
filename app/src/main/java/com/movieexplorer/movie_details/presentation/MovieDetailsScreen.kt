@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -26,14 +27,15 @@ import com.movieexplorer.ui.theme.Gold
 @Composable
 fun MovieDetailsScreen(
     movieId: Int,
-    viewModel: MovieDetailsViewModel,
+    //viewModel: MovieDetailsViewModel,
     navController: NavHostController
 ) {
-    val viewModel: MovieDetailsViewModel = viewModel()
+    val viewModel: MovieDetailsViewModel = hiltViewModel()
+    //val viewModel: MovieDetailsViewModel = viewModel()
 
-    LaunchedEffect(movieId) {
+    /*LaunchedEffect(movieId) {
         viewModel.loadMovieDetails(movieId)
-    }
+    }*/
 
     val state = viewModel.state
 

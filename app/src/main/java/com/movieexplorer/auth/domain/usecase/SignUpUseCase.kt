@@ -2,8 +2,9 @@ package com.movieexplorer.authentication.domain.use_case
 
 import com.movieexplorer.authentication.domain.model.User
 import com.movieexplorer.authentication.domain.repository.AuthRepository
+import javax.inject.Inject
 
-class SignUpUseCase(  //to save new user
+class SignUpUseCase @Inject constructor(  //to save new user
     private val repository: AuthRepository
 ) {
 
@@ -14,6 +15,7 @@ class SignUpUseCase(  //to save new user
         }
 
         //  EMAIL VALIDATION (HERE)
+        //Regex is a pattern used to check if text follows a specific format like email validation password rules phone number search filters text extraction
         val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()  //email must look like: test@gmail.com
 
         if (!emailRegex.matches(user.email)) {

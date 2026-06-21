@@ -16,20 +16,22 @@ import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.*
 import com.movieexplorer.R
 import com.movieexplorer.ui.theme.Gold
+import androidx.hilt.navigation.compose.hiltViewModel
 
-@Composable
-fun LoginScreen(
-    viewModel: LoginViewModel,
-    onLoginSuccess: () -> Unit,
-    onNavigateToSignUp: () -> Unit
+@Composable //This function draws UI
+fun LoginScreen( //This screen is where everything comes together
+    //viewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit, // Give me a function to run when login succeeds. I don't need any parameters or return value
+    onNavigateToSignUp: () -> Unit //Give me a function. When I call it, it will navigate to Sign Up
 ) {
 
+    val viewModel: LoginViewModel = hiltViewModel()
     val state = viewModel.state
 
-    val composition by rememberLottieComposition(
+    val composition by rememberLottieComposition( //loads
         LottieCompositionSpec.RawRes(R.raw.splash)
     )
-    val progress by animateLottieCompositionAsState(composition)
+    val progress by animateLottieCompositionAsState(composition) //Animates it
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
@@ -53,7 +55,7 @@ fun LoginScreen(
     ) {
 
         //  LOADING
-        if (state.isLoading) {
+        if (state.isLoading) { //come from viewModel
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = Gold
@@ -102,8 +104,8 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             TextField(
-                value = state.email,
-                onValueChange = viewModel::onEmailChange,
+                value = state.email, //Shows current email.
+                onValueChange = viewModel::onEmailChange,// is shorthand for onValueChange = { viewModel.onEmailChange(it)}
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Enter email") }
             )
@@ -176,7 +178,7 @@ fun LoginScreen(
             // SUCCESS
             if (state.success) {
                 LaunchedEffect(Unit) {
-                    onLoginSuccess()
+                    onLoginSuccess() //runs Usually navController.navigate("home")
                 }
             }
         }

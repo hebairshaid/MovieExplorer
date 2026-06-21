@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.*
@@ -23,18 +24,19 @@ import com.movieexplorer.ui.theme.Gold
 
 @Composable
 fun MovieScreen(
-    viewModel: HomeViewModel,
+    //viewModel: HomeViewModel,
     navController: NavController,
     onLogout: () -> Unit
 ) {
 
+    val viewModel: HomeViewModel = hiltViewModel()
     var selectedTab by remember { mutableStateOf(0) }
 
     val state = viewModel.state.value
 
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         viewModel.loadMovies(28)
-    }
+    }*/
 
     val tabs = listOf("Action", "Comedy", "Adventure")
 
@@ -131,13 +133,17 @@ fun MovieScreen(
                     selected = selectedTab == index,
                     onClick = {
                         selectedTab = index
+                        viewModel.onTabSelected(index)
+                    },
+                    /*onClick = {
+                        selectedTab = index
 
                         when (index) {
                             0 -> viewModel.loadMovies(28)
                             1 -> viewModel.loadMovies(35)
                             2 -> viewModel.loadMovies(12)
                         }
-                    },
+                    },*/
                     text = {
                         Text(title)
                     }

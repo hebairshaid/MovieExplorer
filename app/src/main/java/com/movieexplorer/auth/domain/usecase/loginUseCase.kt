@@ -3,8 +3,9 @@ package com.movieexplorer.auth.domain.usecase
 import com.movieexplorer.auth.domain.session.SessionRepository
 import com.movieexplorer.authentication.domain.model.User
 import com.movieexplorer.authentication.domain.repository.AuthRepository
+import javax.inject.Inject
 
-class LoginUseCase(  //logs user in and save the session
+class LoginUseCase @Inject constructor(  //logs user in and save the session
     private val repository: AuthRepository,  //to check login credentials create an object instance
     private val sessionRepository: SessionRepository //to save login token
 ) {

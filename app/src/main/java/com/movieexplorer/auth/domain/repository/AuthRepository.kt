@@ -2,6 +2,7 @@ package com.movieexplorer.authentication.domain.repository
 
 import com.movieexplorer.auth.data.local.AuthResponse
 import com.movieexplorer.authentication.domain.model.User
+import javax.inject.Inject
 
 interface AuthRepository { //define what app must do not how to do
                            //any class that implements it MUST follow these rules

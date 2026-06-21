@@ -7,3 +7,7 @@ data class LoginState(
     val error: String? = null,
     val success: Boolean = false
 )
+/*
+LoginState is a single object that contains everything the Login screen needs to know:
+the user's email, password, loading status, error message, and whether login was successful
+*/

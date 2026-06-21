@@ -8,7 +8,6 @@ interface MovieApi {
 
     @GET("discover/movie")
     suspend fun getMovies(
-        @Query("api_key") apiKey: String,
-        @Query("with_genres") genreId: Int
+        @Query("api_key") apiKey: String, @Query("with_genres") genreId: Int
     ): MovieResponseDto
 }

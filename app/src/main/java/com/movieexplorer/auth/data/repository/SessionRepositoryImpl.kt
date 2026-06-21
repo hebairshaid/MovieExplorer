@@ -3,8 +3,9 @@ package com.movieexplorer.auth.data.repository
 import com.movieexplorer.auth.data.local.SessionManager
 import com.movieexplorer.auth.domain.session.SessionRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class SessionRepositoryImpl(  //layer between app logic(view model) and dataStore (a real implementation of session logic
+class SessionRepositoryImpl @Inject constructor (  //layer between app logic(view model) and dataStore (a real implementation of session logic
     private val sessionManager: SessionManager
 ) : SessionRepository {
 

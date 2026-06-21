@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.*
 import com.movieexplorer.R
@@ -19,11 +20,12 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenUI(
-    viewModel: SplashViewModel,
+    //viewModel: SplashViewModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
 
+    val viewModel: SplashViewModel = hiltViewModel()
     val state = viewModel.isLoggedIn
 
     val composition by rememberLottieComposition(

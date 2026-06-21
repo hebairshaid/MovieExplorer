@@ -13,13 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.movieexplorer.ui.theme.Gold
 
 @Composable
 fun SignUpScreen(
-    viewModel: SignUpViewModel
+   // viewModel: SignUpViewModel
+    onNavigate: () -> Unit={}
 ) {
 
+    val viewModel: SignUpViewModel = hiltViewModel()
     val state = viewModel.state
 
 
@@ -94,7 +97,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 📧 EMAIL
+            //  EMAIL
             Text("Email", color = Gold,fontSize = 20.sp)
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -108,7 +111,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🔒 PASSWORD
+            //  PASSWORD
             Text("Password", color = Gold,fontSize = 20.sp)
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -136,7 +139,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // 🔘 CENTER BUTTON
+            //  CENTER BUTTON
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center

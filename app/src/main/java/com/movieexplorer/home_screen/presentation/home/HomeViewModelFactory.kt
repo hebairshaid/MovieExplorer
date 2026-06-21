@@ -1,4 +1,4 @@
-package com.movieexplorer.home_screen.presentation.home
+/*package com.movieexplorer.home_screen.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,4 +11,4 @@ class HomeViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return HomeViewModel(getMoviesUseCase) as T
     }
-}
+}*/

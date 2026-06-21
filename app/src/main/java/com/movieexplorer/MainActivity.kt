@@ -4,6 +4,34 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
+import com.movieexplorer.navigation.NavGraph
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint //it tells hilt This Android class can receive dependencies from Hilt
+class MainActivity : ComponentActivity() { //create everything and connect everything together this run first
+
+    override fun onCreate(savedInstanceState: Bundle?) { //Called when app starts. Android puts:movieId=5 inside a Bundle internally.
+        super.onCreate(savedInstanceState)
+
+        setContent { //Everything inside here is UI + setup
+
+            val navController = rememberNavController() //This controls screen navigation
+
+            NavGraph(
+                navController = navController
+            )
+        }
+    }
+}
+//A Bundle is a key-value container used to pass data between
+// Android components like Activities and Screens.
+
+/*package com.movieexplorer
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 
 import com.movieexplorer.auth.data.local.SessionManager
@@ -31,71 +59,72 @@ import com.movieexplorer.home_screen.data.remote.MovieApiInstance
 import com.movieexplorer.home_screen.data.repository.MovieRepositoryImpl
 import com.movieexplorer.home_screen.domain.usecase.GetMoviesUseCase
 import com.movieexplorer.home_screen.presentation.home.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint  //it tells hilt This Android class can receive dependencies from Hilt
+class MainActivity : ComponentActivity() { //create everything and connect everything together this run first
 
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) { //Called when app starts.
         super.onCreate(savedInstanceState)
 
-        setContent {
+        setContent { //Everything inside here is UI + setup
 
             // NAVIGATION
-            val navController = rememberNavController()
+            val navController = rememberNavController() //This controls screen navigation
 
-            val context = this
+            val context = this //Gives access to Android system (needed for DB, DataStore, etc)
 
             //  ROOM DB
-            val db = Room.databaseBuilder(
-                context,
+            val db = Room.databaseBuilder( //Creates database named "movie_db"
+                context,                   //uses appDatabase
                 AppDatabase::class.java,
                 "movie_db"
             ).build()
 
-            val dao = db.userDao()
+            val dao = db.userDao() //Gets access to database functions insert check login
 
-            val movieRepository = MovieRepositoryImpl(
+            val movieRepository = MovieRepositoryImpl( //Connects to internet (API)
                 MovieApiInstance.api
             )
 
-            val getMoviesUseCase = GetMoviesUseCase(
+            val getMoviesUseCase = GetMoviesUseCase( //fetch movies
                 movieRepository
             )
 
-            val homeViewModel = HomeViewModel(
+            val homeViewModel = HomeViewModel(  //UI controller for Home screen
                 getMoviesUseCase
             )
 
             // SESSION
-            val sessionManager = SessionManager(context)
+            val sessionManager = SessionManager(context)  //Saves token in DataStore
             val sessionRepository = SessionRepositoryImpl(sessionManager)
 
             //  AUTH
-            val authRepository = AuthRepositoryImpl(dao)
+            val authRepository = AuthRepositoryImpl(dao) //Talks to ROOM database for:login and signup
 
             //  USE CASES
-            val checkSessionUseCase = CheckSessionUseCase(sessionRepository)
+            val checkSessionUseCase = CheckSessionUseCase(sessionRepository)//Used in splash screen
             val loginUseCase = LoginUseCase(authRepository, sessionRepository)
             val signUpUseCase = SignUpUseCase(authRepository)
 
             //  VIEWMODELS
-            val splashViewModel = SplashViewModel(checkSessionUseCase)
+            val splashViewModel = SplashViewModel(checkSessionUseCase) //decide go to login OR home
             val loginViewModel = LoginViewModel(loginUseCase)
             val signUpViewModel = SignUpViewModel(signUpUseCase)
 
-            // 🎬 MOVIE DETAILS FACTORY (ONLY ONCE)
+            // MOVIE DETAILS FACTORY (ONLY ONCE)
             val movieDetailsFactory = MovieDetailsViewModelFactory(
                 GetMovieDetailsUseCase(
                     MovieDetailRepositoryImpl(MovieDetailApiInstance.api)
                 )
             )
 
-            val logoutUseCase = LogoutUseCase(sessionRepository)
+           // val logoutUseCase = LogoutUseCase(sessionRepository)
 
             //  NAVIGATION
            // val navController = rememberNavController()
 
-            NavGraph(
+            NavGraph( //Sends everything into navigation system
                 navController = navController,
                 splashViewModel = splashViewModel,
                 loginViewModel = loginViewModel,
@@ -105,4 +134,4 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-}
+}*/

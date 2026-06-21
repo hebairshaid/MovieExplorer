@@ -1,4 +1,4 @@
-package com.movieexplorer.data.remote
+/*package com.movieexplorer.data.remote
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,4 +25,4 @@ object RetrofitInstance {
         .client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-}
+}*/

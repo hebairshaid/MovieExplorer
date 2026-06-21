@@ -5,8 +5,9 @@ import com.movieexplorer.auth.data.local.UserEntity
 import com.movieexplorer.authentication.data.local.UserDao
 import com.movieexplorer.authentication.domain.model.User
 import com.movieexplorer.authentication.domain.repository.AuthRepository
+import javax.inject.Inject
 
-class AuthRepositoryImpl(
+class AuthRepositoryImpl @Inject constructor(
     private val dao: UserDao
 ) : AuthRepository {
 

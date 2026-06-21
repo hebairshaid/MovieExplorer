@@ -2,8 +2,9 @@ package com.movieexplorer.authentication.domain.use_case
 
 import com.movieexplorer.auth.domain.session.SessionRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class CheckSessionUseCase(
+class CheckSessionUseCase @Inject constructor(
     private val sessionRepository: SessionRepository
 ) {
     operator fun invoke(): Flow<String?> { //invoke allow you to call the class like a function instead of write checkSessionUseCase.invoke() you can write checkSessionUseCase

@@ -1,4 +1,4 @@
-package com.movieexplorer.home_screen.data.remote
+/*package com.movieexplorer.home_screen.data.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,4 +14,4 @@ object MovieApiInstance {
             .build()
             .create(MovieApi::class.java)
     }
-}
+}*/

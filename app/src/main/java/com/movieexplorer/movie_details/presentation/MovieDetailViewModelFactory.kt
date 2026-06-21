@@ -1,4 +1,4 @@
-package com.movieexplorer.movie_details.presentation
+/*package com.movieexplorer.movie_details.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -19,4 +19,4 @@ class MovieDetailsViewModelFactory(
 
         throw IllegalArgumentException("Unknown ViewModel class")
     }
-}
+}*/
