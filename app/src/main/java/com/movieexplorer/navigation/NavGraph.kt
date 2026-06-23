@@ -34,7 +34,7 @@ navController: NavHostController
     ) {
 
         // 🔵 SPLASH
-        composable("splash") {
+        composable(Screen.Splash) {
             SplashScreenUI(
                 onNavigateToLogin = {
                     navController.navigate("login") {
@@ -50,7 +50,7 @@ navController: NavHostController
         }
 
         // 🔵 LOGIN
-        composable("login") {
+        composable(Screen.Login) {
             LoginScreen(
                 onNavigateToSignUp = {
                     navController.navigate("signup")
@@ -64,7 +64,7 @@ navController: NavHostController
         }
 
         // 🔵 HOME
-        composable("home") {
+        composable(Screen.Home) {
             MovieScreen(
                 navController = navController,
                 onLogout = {
@@ -76,7 +76,7 @@ navController: NavHostController
         }
 
         // 🔵 SIGNUP
-        composable("signup") {
+        composable(Screen.SignUp) {
             SignUpScreen(
                 onNavigate = {
                     navController.navigate("login") {
@@ -88,7 +88,7 @@ navController: NavHostController
 
         // 🔵 MOVIE DETAILS
         composable(
-            route = "movie_details/{movieId}",
+            route = Screen.MovieDetails,
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
         ) {
             MovieDetailsScreen(

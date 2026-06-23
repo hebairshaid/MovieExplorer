@@ -98,7 +98,13 @@ fun MovieScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = onLogout,
+                onClick = {
+                    viewModel.logout {
+                        navController.navigate("login") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Gold,
                     contentColor = Color.Black

@@ -10,12 +10,14 @@ import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.SavedStateHandle
+import com.movieexplorer.auth.domain.usecase.LogoutUseCase
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getMoviesUseCase: GetMoviesUseCase,
+    private val logoutUseCase: LogoutUseCase,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : ViewModel()  {
 
     private val genreId: Int = savedStateHandle["genreId"] ?: 28 //(28 is default genre fallback)
 
@@ -27,6 +29,17 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadMovies(currentGenreId)
+    }
+
+    fun logout(onLogoutDone: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                logoutUseCase()   // clears session token
+                onLogoutDone()    // navigate after clearing
+            } catch (e: Exception) {
+                println("Logout failed: ${e.message}")
+            }
+        }
     }
 
     fun onTabSelected(index: Int) {

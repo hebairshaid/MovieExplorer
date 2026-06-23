@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.movieexplorer.home_screen.domain.model.Movie
+import com.movieexplorer.home_screen.util.toPosterUrl
 import com.movieexplorer.ui.theme.CardBlue
 import com.movieexplorer.ui.theme.Gold
 
@@ -47,7 +48,7 @@ fun MovieCard(
         ) {
 
             AsyncImage(
-                model = "https://image.tmdb.org/t/p/w500${movie.posterUrl}",
+                model = movie.posterUrl.toPosterUrl(),
                 contentDescription = movie.title,
                 modifier = Modifier
                     .width(95.dp)

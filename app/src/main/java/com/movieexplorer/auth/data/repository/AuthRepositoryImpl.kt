@@ -14,17 +14,19 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUp(user: User) {
         dao.insertUser(          //receive user and convert it userEntity
             UserEntity(
-                name = user.name,
-                email = user.email,
-                password = user.password
+                name = user.name.trim(), //trim remove the spaces
+                email = user.email.trim().lowercase(),
+                password = user.password.trim()
             )
         )
     }
 
     override suspend fun login(email: String, password: String): AuthResponse {
 
-        val user = dao.login(email, password)   // do we have this user
-            ?: throw Exception("Invalid credentials")
+        val user = dao.login(
+            email.trim().lowercase(),
+            password.trim()
+        ) ?: throw Exception("Invalid credentials")
 
         return AuthResponse(          //convert database user to domain user to send it back to app
             user = User(
