@@ -45,8 +45,8 @@ class SignUpViewModel @Inject constructor(
 
                 signUpUseCase(
                     User(
-                        name = state.name,
-                        email = state.email,
+                        name = state.name.trim(),
+                        email = state.email.trim().lowercase(),
                         password = state.password
                     )
                 )

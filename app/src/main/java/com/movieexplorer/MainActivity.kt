@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() { //create everything and connect every
 
     override fun onCreate(savedInstanceState: Bundle?) { //Called when app starts. Android puts:movieId=5 inside a Bundle internally.
         super.onCreate(savedInstanceState)
-
+        //deleteDatabase("movie_db")
         setContent { //Everything inside here is UI + setup
 
             val navController = rememberNavController() //This controls screen navigation

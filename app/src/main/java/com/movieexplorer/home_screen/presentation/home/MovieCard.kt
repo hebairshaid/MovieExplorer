@@ -31,6 +31,7 @@ fun MovieCard(
             .padding(horizontal = 14.dp, vertical = 6.dp)
             .clickable {
 
+
                 // ✅ HERE IS THE CORRECT PLACE
                 println("🔥 CLICKED MOVIE ID = ${movie.id}")
 
