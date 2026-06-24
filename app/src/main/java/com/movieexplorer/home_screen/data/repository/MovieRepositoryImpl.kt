@@ -6,6 +6,7 @@ import com.movieexplorer.home_screen.data.remote.MovieApi
 import com.movieexplorer.home_screen.domain.model.Movie
 import com.movieexplorer.home_screen.domain.repository.MovieRepository
 import javax.inject.Inject
+import com.movieexplorer.BuildConfig
 
 class MovieRepositoryImpl @Inject constructor(
     private val api: MovieApi
@@ -13,8 +14,11 @@ class MovieRepositoryImpl @Inject constructor(
 
     override suspend fun getMovies(genreId: Int): List<Movie> {
 
+        println("KEY: ${BuildConfig.TMDB_API_KEY}")
+
         return api.getMovies(
-            apiKey = "1da330dbe24c8b172c9a89f3dfe342db",
+            //apiKey = "1da330dbe24c8b172c9a89f3dfe342db",
+            apiKey = BuildConfig.TMDB_API_KEY,
             genreId = genreId
         ).results.map { dto: MovieDto ->
             dto.toMovie()
