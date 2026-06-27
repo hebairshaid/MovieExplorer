@@ -72,6 +72,9 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.foundation:foundation:1.6.8")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
     implementation ("androidx.security:security-crypto:1.1.0-alpha06")
 

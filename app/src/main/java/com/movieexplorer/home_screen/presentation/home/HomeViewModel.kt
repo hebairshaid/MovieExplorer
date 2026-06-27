@@ -11,6 +11,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.SavedStateHandle
 import com.movieexplorer.auth.domain.usecase.LogoutUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -21,9 +24,22 @@ class HomeViewModel @Inject constructor(
 
     private val genreId: Int = savedStateHandle["genreId"] ?: 28 //(28 is default genre fallback)
 
-    private val _state = mutableStateOf(HomeState())
+   /* private val _state = mutableStateOf(HomeState())
     val state: State<HomeState> = _state
 
+    What this means:
+   _state = mutable + internal
+   state = read-only for UI
+   Compose observes mutableStateOf
+
+   /* This works, but it's Compose-only reactive system*/
+    private val _state = MutableStateFlow(HomeState()) //_state writable,only ViewModel can change it
+    val state: StateFlow<HomeState> = _state.asStateFlow() //state read-only,UI only observes it
+    //.asStateFlow() converts MutableStateFlow → safe read-only StateFlow */
+
+    private val _state = MutableStateFlow<HomeUiState>(HomeUiState.Loading) //_state writable,only ViewModel can change it
+    val state: StateFlow<HomeUiState> = _state.asStateFlow() //state read-only,UI only observes it
+    //.asStateFlow() converts MutableStateFlow → safe read-only StateFlow
 
     private var currentGenreId: Int = 28
 
@@ -58,21 +74,24 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            _state.value = HomeState(isLoading = true)
+           // _state.value = HomeState(isLoading = true)
+            _state.value = HomeUiState.Loading
 
             try {
                 val movies: List<Movie> = getMoviesUseCase(genreId)
 
-                _state.value = HomeState(
+               /* _state.value = HomeState(
                     movies = movies,
                     isLoading = false
-                )
+                )*/
+                _state.value = HomeUiState.Success(movies)
 
             } catch (e: Exception) {
-                _state.value = HomeState(
+               /* _state.value = HomeState(
                     error = e.message,
                     isLoading = false
-                )
+                )*/
+                _state.value = HomeUiState.Error(e.message ?: "Unknown error")
             }
         }
     }

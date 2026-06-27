@@ -1,4 +1,4 @@
-package com.movieexplorer.authentication.presentation.login
+/*package com.movieexplorer.authentication.presentation.login
 
 data class LoginState(
     val email: String = "",

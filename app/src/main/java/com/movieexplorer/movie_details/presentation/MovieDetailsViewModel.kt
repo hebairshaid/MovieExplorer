@@ -10,6 +10,9 @@ import com.movieexplorer.movie_details.domain.usecase.GetMovieDetailsUseCase
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
@@ -22,8 +25,10 @@ class MovieDetailsViewModel @Inject constructor(
     So when you navigate like this: navController.navigate("movie_details/5")
     Hilt automatically stores: movieId = 5 inside SavedStateHandle
      */
-    var state by mutableStateOf(MovieDetailsUiState()) // This is your UI memory it contain loading state,movie data, error message ,state changes → UI recomposes automatically
-        private set
+    /*var state by mutableStateOf(MovieDetailsState()) // This is your UI memory it contain loading state,movie data, error message ,state changes → UI recomposes automatically
+        private set*/
+    private val _state = MutableStateFlow<MovieDetailsUiState>(MovieDetailsUiState.Loading)
+    val state: StateFlow<MovieDetailsUiState> = _state.asStateFlow()
 
     init {
         // Runs automatically when the ViewModel is created.
@@ -44,28 +49,36 @@ class MovieDetailsViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            state = state.copy(isLoading = true)
+            //state = state.copy(isLoading = true)
+            _state.value = MovieDetailsUiState.Loading
 
             try {
                 val movie = useCase(movieId)
 
                 println("🎬 MOVIE FROM API = $movie")
 
-                state = state.copy(
-                    isLoading = false,
-                    movie = movie,
-                    error = null
-                )
+                _state.value = MovieDetailsUiState.Success(movie)
+
+                /* state = state.copy(
+                     isLoading = false,
+                     movie = movie,
+                     error = null
+                 )*/
+
 
             } catch (e: Exception) {
 
                 println("❌ ERROR = ${e.message}")
 
-                state = state.copy(
+                _state.value = MovieDetailsUiState.Error(
+                    e.message ?: "Error loading movie"
+                )
+
+                /*state = state.copy(
                     isLoading = false,
                     movie = null,
                     error = e.message
-                )
+                )*/
             }
         }
     }

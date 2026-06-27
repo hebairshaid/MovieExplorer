@@ -21,7 +21,26 @@ import com.airbnb.lottie.compose.*
 import com.movieexplorer.R
 import com.movieexplorer.ui.theme.DarkBlue
 import com.movieexplorer.ui.theme.Gold
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import kotlinx.coroutines.launch
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
+import android.app.Activity
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MovieScreen(
     //viewModel: HomeViewModel,
@@ -30,15 +49,29 @@ fun MovieScreen(
 ) {
 
     val viewModel: HomeViewModel = hiltViewModel()
-    var selectedTab by remember { mutableStateOf(0) }
+   // var selectedTab by remember { mutableStateOf(0) }
 
-    val state = viewModel.state.value
+    val tabs = listOf("Action", "Comedy", "Adventure")
+
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { tabs.size }
+    )
+
+    val scope = rememberCoroutineScope()
+
+
+    //val state = viewModel.state.value
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+    /*
+    viewModel.state This is a Flow (stream of updates)
+    collectAsStateWithLifecycle() Converts Flow → Compose State
+    .value Gets actual HomeState object
+    */
 
     /*LaunchedEffect(Unit) {
         viewModel.loadMovies(28)
     }*/
-
-    val tabs = listOf("Action", "Comedy", "Adventure")
 
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.splash)
@@ -61,11 +94,26 @@ fun MovieScreen(
         )
     )
 
+    val view = LocalView.current
+    val activity = view.context as Activity
+
+    SideEffect {
+        val window = activity.window
+
+        window.statusBarColor = DarkBlue.toArgb()
+
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+    }
+
+    var menuExpanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBlue)
+            .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
+
 
         // HEADER
         Row(
@@ -97,34 +145,59 @@ fun MovieScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = {
-                    viewModel.logout {
-                        navController.navigate("login") {
-                            popUpTo("home") { inclusive = true }
+            Box {
+
+                IconButton(onClick = { menuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Menu",
+                        tint = Gold
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+
+                    DropdownMenuItem(
+                        text = { Text("Profile") },
+                        onClick = {
+                            menuExpanded = false
+                            // TODO: navigate to profile
                         }
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Gold,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("Logout")
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Logout") },
+                        onClick = {
+                            menuExpanded = false
+
+                            viewModel.logout {
+                                navController.navigate("login") {
+                                    popUpTo("home") { inclusive = true }
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
 
         // TABS
         TabRow(
-            selectedTabIndex = selectedTab,
+            selectedTabIndex = pagerState.currentPage,
             containerColor = DarkBlue,
             contentColor = Gold,
-            indicator = { tabPositions ->
+             indicator = { tabPositions ->
+
+                val currentTabPosition = tabPositions[pagerState.currentPage]
+
                 Box(
-                    modifier = Modifier
-                        .tabIndicatorOffset(tabPositions[selectedTab])
+                    Modifier
+                        .tabIndicatorOffset(currentTabPosition)
                         .height(3.dp)
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = 24.dp)
                         .background(
                             color = Gold,
                             shape = RoundedCornerShape(50)
@@ -136,9 +209,11 @@ fun MovieScreen(
             tabs.forEachIndexed { index, title ->
 
                 Tab(
-                    selected = selectedTab == index,
+                    selected = pagerState.currentPage == index,
                     onClick = {
-                        selectedTab = index
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
                         viewModel.onTabSelected(index)
                     },
                     /*onClick = {
@@ -151,14 +226,17 @@ fun MovieScreen(
                         }
                     },*/
                     text = {
-                        Text(title)
+                        Text(
+                            text = title,
+                            color = if (pagerState.currentPage == index) Gold else Color.Gray
+                        )
                     }
                 )
             }
         }
 
         // CONTENT
-        when {
+        /*when {
 
             state.isLoading -> {
 
@@ -185,24 +263,66 @@ fun MovieScreen(
                 }
             }
 
-            else -> {
+            else -> {*/
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            beyondBoundsPageCount = 1
+        ) { page ->
+
+            LaunchedEffect(page) {
+                viewModel.onTabSelected(page)
+            }
+
+            when (val uiState = state) {
+
+            is HomeUiState.Loading -> {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Gold)
+                }
+            }
+
+            is HomeUiState.Error -> {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = uiState.message,
+                        color = Color.White
+                    )
+                }
+            }
+
+            is HomeUiState.Success -> {
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
 
-                    items(state.movies) { movie ->
+                    //items(state.movies) { movie ->
+                    items(uiState.movies) { movie ->
+
+                        val scale by animateFloatAsState(
+                            targetValue = 1f,
+                            label = ""
+                        )
 
                         MovieCard(
                             movie = movie,
-                            genre = tabs[selectedTab],
+                            genre = tabs[page],
                             onClick = {
 
                                 println("🔥 CLICKED MOVIE ID = ${movie.id}")
 
                                 navController.currentBackStackEntry
                                     ?.savedStateHandle
-                                    ?.set("genre", tabs[selectedTab])
+                                    ?.set("genre", tabs[page])
 
                                 navController.navigate(
                                     "movie_details/${movie.id}"
@@ -214,4 +334,4 @@ fun MovieScreen(
             }
         }
     }
-}
+}}

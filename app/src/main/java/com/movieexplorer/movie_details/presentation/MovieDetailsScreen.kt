@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -37,15 +38,17 @@ fun MovieDetailsScreen(
         viewModel.loadMovieDetails(movieId)
     }*/
 
-    val state = viewModel.state
+   // val state = viewModel.state
+    val state = viewModel.state.collectAsStateWithLifecycle().value
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF030B2C))
+            .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
 
-        when {
+      /*  when {
 
             state.isLoading -> {
                 CircularProgressIndicator(
@@ -54,7 +57,17 @@ fun MovieDetailsScreen(
                 )
             }
 
-            state.movie != null -> {
+            state.movie != null -> */
+        when (state) {
+
+            is MovieDetailsUiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Gold
+                )
+            }
+
+            is MovieDetailsUiState.Success ->{
 
                 val movie = state.movie
 
@@ -252,14 +265,20 @@ fun MovieDetailsScreen(
                     }
                 }
             }
-
-            state.error != null -> {
+            is MovieDetailsUiState.Error -> {
+                Text(
+                    text = state.message,
+                    color = Color.Red,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+           /* state.error != null -> {
                 Text(
                     text = "Error: ${state.error}",
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
-            }
+            }*/
 
             else -> {
                 Text(

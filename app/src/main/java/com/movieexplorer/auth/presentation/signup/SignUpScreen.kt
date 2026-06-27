@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.movieexplorer.auth.presentation.signup.SignUpUiState
 import com.movieexplorer.ui.theme.Gold
 
 @Composable
@@ -23,8 +25,13 @@ fun SignUpScreen(
 ) {
 
     val viewModel: SignUpViewModel = hiltViewModel()
-    val state = viewModel.state
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+    //val state = viewModel.state
 
+    val name = viewModel.name.collectAsStateWithLifecycle().value
+    val email = viewModel.email.collectAsStateWithLifecycle().value
+    val password = viewModel.password.collectAsStateWithLifecycle().value
+    val confirmPassword = viewModel.confirmPassword.collectAsStateWithLifecycle().value
 
     val backDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -53,12 +60,23 @@ fun SignUpScreen(
         }
 
         // 🔄 LOADING
-        if (state.isLoading) {
+       /* if (state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = Gold
             )
-        }
+        }*/
+        when (state) {
+
+            // 🔄 LOADING
+            is SignUpUiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Gold
+                )
+            }
+
+            else ->
 
         // 📄 CONTENT
         Column(
@@ -89,7 +107,8 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             TextField(
-                value = state.name,
+               // value = state.name,
+                value = name,
                 onValueChange = viewModel::onNameChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Enter name") }
@@ -103,7 +122,8 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             TextField(
-                value = state.email,
+                //value = state.email,
+                value = email,
                 onValueChange = viewModel::onEmailChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Enter email") }
@@ -117,7 +137,8 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             TextField(
-                value = state.password,
+               // value = state.password,
+                value = password,
                 onValueChange = viewModel::onPasswordChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Enter password") }
@@ -131,7 +152,8 @@ fun SignUpScreen(
 
 
             TextField(
-                value = state.confirmPassword,
+                //value = state.confirmPassword,
+                value = confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Confirm Password") }
@@ -155,9 +177,28 @@ fun SignUpScreen(
                     Text("Sign Up", fontSize = 25.sp)
                 }
             }
+            // ERROR
+            if (state is SignUpUiState.Error) {
+                Text(
+                    text = state.message,
+                    color = Color.Red
+                )
+            }
+
+            // SUCCESS
+            if (state is SignUpUiState.Success) {
+                Text(
+                    text = state.message,
+                    color = Color.Green
+                )
+
+                LaunchedEffect(Unit) {
+                    onNavigate()
+                }
+            }
 
             // ERROR
-            state.error?.let {
+            /*state.error?.let {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(it, color = Color.Red)
             }
@@ -166,7 +207,8 @@ fun SignUpScreen(
             if (state.success) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text("Account created 🎉", color = Color.Green)
-            }
+            }*/
         }
     }
+}
 }
