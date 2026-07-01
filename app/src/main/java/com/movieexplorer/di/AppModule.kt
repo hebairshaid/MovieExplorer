@@ -4,8 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import com.movieexplorer.authentication.data.local.AppDatabase
 import com.movieexplorer.authentication.data.local.UserDao
-import com.movieexplorer.auth.data.local.SessionManager
+//import com.movieexplorer.auth.data.local.SessionManager
 import com.movieexplorer.auth.data.repository.SessionRepositoryImpl
+import com.movieexplorer.auth.data.security.BCryptPasswordHasher
+import com.movieexplorer.auth.data.security.SecureSessionManager
+//import com.movieexplorer.auth.data.security.Sha256PasswordHasher
+import com.movieexplorer.auth.domain.security.PasswordHasher
 import com.movieexplorer.auth.domain.session.SessionRepository
 import com.movieexplorer.authentication.data.repository.AuthRepositoryImpl
 import com.movieexplorer.authentication.domain.repository.AuthRepository
@@ -44,28 +48,45 @@ object AppModule { //Why object and not class? Because Only one AppModule is nee
     }
 
     // 🟦 SESSION MANAGER
-    @Provides
+   /* @Provides
     @Singleton
     fun provideSessionManager(  //Same as val sessionManager = SessionManager(context) that was in mainActivity
         @ApplicationContext context: Context
     ): SessionManager {
         return SessionManager(context)
+    }*/
+    @Provides
+    @Singleton
+    fun provideSecureSessionManager(
+        @ApplicationContext context: Context
+    ): SecureSessionManager {
+        return SecureSessionManager(context)
     }
 
     // 🟦 SESSION REPOSITORY
     @Provides  // provider is basically replacing one line that used to be in your MainActivity which is val =
     fun provideSessionRepository(
-        sessionManager: SessionManager
+        sessionManager: SecureSessionManager
     ): SessionRepository {
         return SessionRepositoryImpl(sessionManager)
+    }
+
+    @Provides
+    @Singleton
+    fun providePasswordHasher(): PasswordHasher {
+        return BCryptPasswordHasher()
     }
 
     // 🟦 AUTH REPOSITORY
     @Provides
     fun provideAuthRepository(
-        dao: UserDao
+        dao: UserDao,
+        passwordHasher: PasswordHasher
     ): AuthRepository {
-        return AuthRepositoryImpl(dao)
+        return AuthRepositoryImpl(
+            dao,
+            passwordHasher
+        )
     }
 
     // 🟦 USE CASES

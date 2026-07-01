@@ -17,6 +17,7 @@ import com.airbnb.lottie.compose.*
 import com.movieexplorer.R
 import com.movieexplorer.ui.theme.Gold
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable //This function draws UI
 fun LoginScreen( //This screen is where everything comes together
@@ -26,7 +27,11 @@ fun LoginScreen( //This screen is where everything comes together
 ) {
 
     val viewModel: LoginViewModel = hiltViewModel()
-    val state = viewModel.state
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+    //val state = viewModel.state
+
+    val email = viewModel.email.collectAsStateWithLifecycle().value  //collectAsStateWithLifecycle() → listens to Flow
+    val password = viewModel.password.collectAsStateWithLifecycle().value //.value → gives the actual String
 
     val composition by rememberLottieComposition( //loads
         LottieCompositionSpec.RawRes(R.raw.splash)
@@ -48,129 +53,172 @@ fun LoginScreen( //This screen is where everything comes together
 
 
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF030B2C))
-    ) {
+    when (state) {
 
-        //  LOADING
-        if (state.isLoading) { //come from viewModel
+        is LoginUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF030B2C)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Gold)
+            }
+        }
+
+        is LoginUiState.Error -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF030B2C)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = state.message,
+                    color = Color.Red
+                )
+            }
+        }
+
+        is LoginUiState.Success -> {
+            LaunchedEffect(Unit) {
+                onLoginSuccess()
+            }
+        }
+
+        is LoginUiState.Idle -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF030B2C))
+            ) {
+
+                //  LOADING
+                /* if (state.isLoading) { //come from viewModel
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = Gold
             )
-        }
+        }*/
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Box (
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-                LottieAnimation(
-                    composition = composition,
-                    progress = progress,
-                    dynamicProperties = dynamicProperties,
-                    modifier = Modifier.size(200.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-                //  TITLE
-                Text(
-                    text = "Login",
-                    color = Gold,
-                    style = MaterialTheme.typography.headlineLarge
-                )
-            }
-
-
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // EMAIL
-            Text("Email", color = Gold, fontSize = 20.sp)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            TextField(
-                value = state.email, //Shows current email.
-                onValueChange = viewModel::onEmailChange,// is shorthand for onValueChange = { viewModel.onEmailChange(it)}
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter email") }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // PASSWORD
-            Text("Password", color = Gold, fontSize = 20.sp)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            TextField(
-                value = state.password,
-                onValueChange = viewModel::onPasswordChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter password") }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            //  LOGIN BUTTON
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = viewModel::login,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Gold,
-                        contentColor = Color.Black
-                    ),
-
-                    ) {
-                    Text("login", fontSize = 25.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Don't have an account? ",
-                    color = Color.White,
-                    fontSize = 10.sp
-                )
-            }
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-            TextButton(
-                    onClick = onNavigateToSignUp
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Text(
-                        text = "Signup",
-                        color = Gold,
-                        fontSize = 10.sp
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LottieAnimation(
+                            composition = composition,
+                            progress = progress,
+                            dynamicProperties = dynamicProperties,
+                            modifier = Modifier.size(200.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        //  TITLE
+                        Text(
+                            text = "Login",
+                            color = Gold,
+                            style = MaterialTheme.typography.headlineLarge
+                        )
+                    }
+
+
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    // EMAIL
+                    Text("Email", color = Gold, fontSize = 20.sp)
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        //value = state.email, //Shows current email.
+                        value = email,
+                        onValueChange = viewModel::onEmailChange,// is shorthand for onValueChange = { viewModel.onEmailChange(it)}
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Enter email") }
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // PASSWORD
+                    Text("Password", color = Gold, fontSize = 20.sp)
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        //value = state.password,
+                        value = password,
+                        onValueChange = viewModel::onPasswordChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Enter password") }
+                    )
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    //  LOGIN BUTTON
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            //onClick = viewModel::login,
+                            onClick = { viewModel.login() },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Gold,
+                                contentColor = Color.Black
+                            ),
+
+                            ) {
+                            Text("login", fontSize = 25.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Don't have an account? ",
+                            color = Color.White,
+                            fontSize = 10.sp
+                        )
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        TextButton(
+                            onClick = onNavigateToSignUp
+                        ) {
+                            Text(
+                                text = "Signup",
+                                color = Gold,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
                 }
             }
-            //  ERROR
-            state.error?.let {
+        }
+    }
+}
+                //  ERROR
+                /*state.error?.let {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(it, color = Color.Red)
             }
@@ -180,7 +228,4 @@ fun LoginScreen( //This screen is where everything comes together
                 LaunchedEffect(Unit) {
                     onLoginSuccess() //runs Usually navController.navigate("home")
                 }
-            }
-        }
-    }
-}
+            }*/

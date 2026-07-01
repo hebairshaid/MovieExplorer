@@ -1,4 +1,4 @@
-package com.movieexplorer.authentication.presentation.signup
+/*package com.movieexplorer.authentication.presentation.signup
 
 data class SignUpState(
     val name: String = "",
@@ -8,4 +8,4 @@ data class SignUpState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val success: Boolean = false
-)
+*/

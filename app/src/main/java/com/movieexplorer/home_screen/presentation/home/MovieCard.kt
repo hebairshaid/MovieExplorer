@@ -17,6 +17,12 @@ import com.movieexplorer.home_screen.domain.model.Movie
 import com.movieexplorer.home_screen.util.toPosterUrl
 import com.movieexplorer.ui.theme.CardBlue
 import com.movieexplorer.ui.theme.Gold
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
+import com.movieexplorer.R
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun MovieCard(
@@ -30,6 +36,7 @@ fun MovieCard(
             .fillMaxWidth()
             .padding(horizontal = 14.dp, vertical = 6.dp)
             .clickable {
+
 
                 // ✅ HERE IS THE CORRECT PLACE
                 println("🔥 CLICKED MOVIE ID = ${movie.id}")
@@ -47,14 +54,32 @@ fun MovieCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            AsyncImage(
-                model = movie.posterUrl.toPosterUrl(),
-                contentDescription = movie.title,
+            Box(
                 modifier = Modifier
-                    .width(95.dp)
-                    .height(140.dp)
+                    .width(110.dp)
+                    .height(160.dp)
                     .clip(RoundedCornerShape(14.dp))
-            )
+            ) {
+
+                // PLACEHOLDER (FIT - not cut)
+                androidx.compose.foundation.Image(
+                    painter = painterResource(R.drawable.placeholder_2_1),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+
+                // ACTUAL IMAGE (CROP - fills like Netflix)
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(movie.posterUrl.toPosterUrl())
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = movie.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(modifier = Modifier.width(12.dp))
 

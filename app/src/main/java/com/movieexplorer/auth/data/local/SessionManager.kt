@@ -1,4 +1,4 @@
-package com.movieexplorer.auth.data.local
+/*package com.movieexplorer.auth.data.local
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -32,4 +32,4 @@ class SessionManager(private val context: Context) {
             prefs.remove(TOKEN_KEY)
         }
     }
-}
+}*/

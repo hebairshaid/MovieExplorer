@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,11 +8,31 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+
+
+val localProperties = Properties()
+val localFile = rootProject.file("local.properties")
+
+if (localFile.exists()) {
+    localProperties.load(localFile.inputStream())
+}
+
+val apiKey = localProperties.getProperty("TMDB_API_KEY") ?: ""
+
 android {
     namespace = "com.movieexplorer"
     compileSdk = 35
 
+
     defaultConfig {
+       // val apiKey = project.findProperty("TMDB_API_KEY") as String
+
+        buildConfigField(
+            "String",
+            "TMDB_API_KEY",
+            "\"$apiKey\""
+        )
+
         applicationId = "com.movieexplorer"
         minSdk = 24
         targetSdk = 35
@@ -23,6 +44,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -50,6 +72,14 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.foundation:foundation:1.6.8")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
+
+    implementation ("org.mindrot:jbcrypt:0.4")
+
     implementation("androidx.compose.material3:material3")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
