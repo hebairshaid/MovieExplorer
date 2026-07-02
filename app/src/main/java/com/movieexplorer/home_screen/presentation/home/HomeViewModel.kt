@@ -1,5 +1,87 @@
 package com.movieexplorer.home_screen.presentation.home
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.SavedStateHandle
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.movieexplorer.home_screen.domain.model.Movie
+import com.movieexplorer.home_screen.domain.usecase.GetMoviesUseCase
+import com.movieexplorer.auth.domain.usecase.LogoutUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val getMoviesUseCase: GetMoviesUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    // initial genre (Action = 28)
+    private val _currentGenre = MutableStateFlow(
+        savedStateHandle["genreId"] ?: 28
+    )
+
+    val currentGenre: StateFlow<Int> = _currentGenre.asStateFlow()
+
+    /**
+     * Paging stream:
+     * - listens to genre changes
+     * - cancels old paging when genre changes
+     * - loads new paging automatically
+     * .cachedIn(viewModelScope)
+     * Means:
+     * “Cache loaded pages inside ViewModel memory”
+     * So:
+     * rotation ❌ no reload
+     * recomposition ❌ no reload
+     * navigation back ❌ no reload
+     */
+    val movies: Flow<PagingData<Movie>> =
+        _currentGenre
+            .flatMapLatest { genreId ->  //If genre changes → cancel old request → start new one
+                getMoviesUseCase(genreId)
+            }
+           // .cachedIn(viewModelScope)
+
+    /**
+     * Handle tab clicks
+     */
+    fun onTabSelected(index: Int) {
+        val genreId = when (index) {
+            0 -> 28 // Action
+            1 -> 35 // Comedy
+            2 -> 12 // Adventure
+            else -> 28
+        }
+
+        _currentGenre.value = genreId
+    }
+
+    /**
+     * Logout (kept as-is)
+     */
+    fun logout(onLogoutDone: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                logoutUseCase()
+                onLogoutDone()
+            } catch (e: Exception) {
+                println("Logout failed: ${e.message}")
+            }
+        }
+    }
+}
+
+/*package com.movieexplorer.home_screen.presentation.home
+
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

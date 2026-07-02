@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.paging.compose.collectAsLazyPagingItems
 
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -62,7 +63,8 @@ fun MovieScreen(
 
 
     //val state = viewModel.state.value
-    val state = viewModel.state.collectAsStateWithLifecycle().value
+    //val state = viewModel.state.collectAsStateWithLifecycle().value
+    val movies = viewModel.movies.collectAsLazyPagingItems()
     /*
     viewModel.state This is a Flow (stream of updates)
     collectAsStateWithLifecycle() Converts Flow → Compose State
@@ -106,6 +108,12 @@ fun MovieScreen(
     }
 
     var menuExpanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.onTabSelected(pagerState.currentPage)
+    }
+
+
 
     Column(
         modifier = Modifier
@@ -214,7 +222,7 @@ fun MovieScreen(
                         scope.launch {
                             pagerState.animateScrollToPage(index)
                         }
-                        viewModel.onTabSelected(index)
+                       // viewModel.onTabSelected(index)
                     },
                     /*onClick = {
                         selectedTab = index
@@ -232,6 +240,81 @@ fun MovieScreen(
                         )
                     }
                 )
+            }
+        }
+
+        // ================= PAGER =================
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { page ->
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            // ITEMS
+            items(
+                count = movies.itemCount,
+                key = { index ->
+                    movies[index]?.id ?: index
+                }
+            ) { index ->
+
+                val movie = movies[index]
+
+                movie?.let {
+                    MovieCard(
+                        movie = it,
+                        genre = tabs[pagerState.currentPage],
+                        onClick = {
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("genre", tabs[pagerState.currentPage])
+
+                            navController.navigate("movie_details/${it.id}")
+                        }
+                    )
+                }
+            }
+
+            // 🔵 LOADING NEXT PAGE (append)
+            if (movies.loadState.append is androidx.paging.LoadState.Loading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Gold)
+                    }
+                }
+            }
+
+            // 🔴 ERROR NEXT PAGE
+            if (movies.loadState.append is androidx.paging.LoadState.Error) {
+                item {
+                    Text(
+                        text = "Error loading more movies",
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            // 🟡 INITIAL LOADING
+            if (movies.loadState.refresh is androidx.paging.LoadState.Loading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Gold)
+                    }
+                }
             }
         }
 
@@ -264,7 +347,7 @@ fun MovieScreen(
             }
 
             else -> {*/
-        HorizontalPager(
+       /* HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
             beyondBoundsPageCount = 1
@@ -272,9 +355,9 @@ fun MovieScreen(
 
             LaunchedEffect(page) {
                 viewModel.onTabSelected(page)
-            }
+            }*/
 
-            when (val uiState = state) {
+           /* when (val uiState = state) {
 
             is HomeUiState.Loading -> {
 
@@ -332,6 +415,6 @@ fun MovieScreen(
                     }
                 }
             }
-        }
+        }*/
     }
 }}

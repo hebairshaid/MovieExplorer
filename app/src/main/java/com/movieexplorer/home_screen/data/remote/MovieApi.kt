@@ -10,7 +10,8 @@ interface MovieApi {
 
     @GET("discover/movie")
     suspend fun getMovies(
-        @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY,
-        @Query("with_genres") genreId: Int
+        @Query("with_genres") genreId: Int,
+        @Query("page") page: Int,
+        @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY
     ): MovieResponseDto
 }

@@ -72,6 +72,10 @@ android {
 }
 
 dependencies {
+
+    implementation("androidx.paging:paging-runtime-ktx:3.3.2")
+    implementation("androidx.paging:paging-compose:3.3.2")
+
     implementation("androidx.compose.foundation:foundation:1.6.8")
 
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
