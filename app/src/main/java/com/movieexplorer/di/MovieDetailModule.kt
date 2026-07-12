@@ -1,7 +1,9 @@
 package com.movieexplorer.di
 
+import com.movieexplorer.movie_details.data.remote.MovieDetailApi
 import com.movieexplorer.movie_details.data.repository.MovieDetailRepositoryImpl
 import com.movieexplorer.movie_details.domain.repository.MovieDetailRepository
+import com.movieexplorer.home_screen.data.local.MovieDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,8 +17,9 @@ object MovieDetailModule {
     @Provides
     @Singleton
     fun provideMovieDetailRepository(
-        api: com.movieexplorer.movie_details.data.remote.MovieDetailApi
+        api: MovieDetailApi,
+        dao: MovieDao
     ): MovieDetailRepository {
-        return MovieDetailRepositoryImpl(api)
+        return MovieDetailRepositoryImpl(api, dao)
     }
 }
