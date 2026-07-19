@@ -76,6 +76,6 @@ BUT safely (because real hash libraries don’t just compare strings).
 
     override suspend fun isEmailExists(email: String): Boolean {  //check email exist used in signup to preventing duplicate accounts
         val cleanEmail = email.trim().lowercase()
-        return dao.getUserByEmail(email) != null
+        return dao.getUserByEmail(cleanEmail) != null
     }
 }

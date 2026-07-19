@@ -65,6 +65,7 @@ fun MovieScreen(
     //val state = viewModel.state.value
     //val state = viewModel.state.collectAsStateWithLifecycle().value
     val movies = viewModel.movies.collectAsLazyPagingItems()
+    val isOnline = viewModel.isOnline.collectAsStateWithLifecycle().value
     /*
     viewModel.state This is a Flow (stream of updates)
     collectAsStateWithLifecycle() Converts Flow → Compose State
@@ -192,6 +193,18 @@ fun MovieScreen(
             }
         }
 
+        if (!isOnline) {
+            Text(
+                text = "You are offline",
+                color = Color.White,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFB45309))
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            )
+        }
+
         // TABS
         TabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -313,6 +326,28 @@ fun MovieScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(color = Gold)
+                    }
+                }
+            }
+
+            // 🔴 INITIAL LOAD ERROR
+            if (movies.loadState.refresh is androidx.paging.LoadState.Error && movies.itemCount == 0) {
+                val error = movies.loadState.refresh as androidx.paging.LoadState.Error
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 100.dp, start = 16.dp, end = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = error.error.message ?: "Failed to load movies",
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(onClick = { movies.retry() }) {
+                            Text("Retry")
+                        }
                     }
                 }
             }

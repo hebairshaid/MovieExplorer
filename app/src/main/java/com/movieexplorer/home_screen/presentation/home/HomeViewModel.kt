@@ -8,19 +8,25 @@ import androidx.paging.cachedIn
 import com.movieexplorer.home_screen.domain.model.Movie
 import com.movieexplorer.home_screen.domain.usecase.GetMoviesUseCase
 import com.movieexplorer.auth.domain.usecase.LogoutUseCase
+import com.movieexplorer.home_screen.util.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getMoviesUseCase: GetMoviesUseCase,
     private val logoutUseCase: LogoutUseCase,
+    networkMonitor: NetworkMonitor,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -30,6 +36,13 @@ class HomeViewModel @Inject constructor(
     )
 
     val currentGenre: StateFlow<Int> = _currentGenre.asStateFlow()
+
+    val isOnline: StateFlow<Boolean> = networkMonitor.isOnline
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = true
+        )
 
     /**
      * Paging stream:
@@ -49,7 +62,7 @@ class HomeViewModel @Inject constructor(
             .flatMapLatest { genreId ->  //If genre changes → cancel old request → start new one
                 getMoviesUseCase(genreId)
             }
-           // .cachedIn(viewModelScope)
+            .cachedIn(viewModelScope)
 
     /**
      * Handle tab clicks

@@ -4,8 +4,11 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import androidx.room.withTransaction
+import com.movieexplorer.BuildConfig
 import com.movieexplorer.home_screen.data.local.CachedMovieEntity
 import com.movieexplorer.home_screen.data.local.MovieDao
+import com.movieexplorer.home_screen.data.local.MovieDatabase
 import com.movieexplorer.home_screen.data.mapper.toEntity
 import com.movieexplorer.home_screen.data.mapper.toMovie
 import com.movieexplorer.home_screen.data.remote.MovieApi
@@ -13,6 +16,7 @@ import com.movieexplorer.home_screen.data.remote.MovieApi
 @OptIn(ExperimentalPagingApi::class)
 class MovieRemoteMediator(
     private val api: MovieApi,
+    private val database: MovieDatabase,
     private val dao: MovieDao,
     private val genreId: Int
 ) : RemoteMediator<Int, CachedMovieEntity>() {
@@ -26,10 +30,7 @@ class MovieRemoteMediator(
 
             val page = when (loadType) {
 
-                LoadType.REFRESH -> {
-                    dao.clearGenre(genreId)
-                    1
-                }
+                LoadType.REFRESH -> 1
 
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(endOfPaginationReached = true)
@@ -39,10 +40,10 @@ class MovieRemoteMediator(
                     val lastItem = state.lastItemOrNull()
 
                     if (lastItem == null) {
-                        1
-                    } else {
-                        (state.pages.sumOf { it.data.size } / 20) + 1
+                        return MediatorResult.Success(endOfPaginationReached = true)
                     }
+
+                    (state.pages.sumOf { it.data.size } / 20) + 1
                 }
             }
 
@@ -50,7 +51,8 @@ class MovieRemoteMediator(
 
             val response = api.getMovies(
                 genreId = genreId,
-                page = page
+                page = page,
+                apiKey = BuildConfig.TMDB_API_KEY
             )
 
             println("Movies from API = ${response.results.size}")
@@ -59,9 +61,12 @@ class MovieRemoteMediator(
                 it.toMovie().toEntity(genreId)
             }
 
-            println("Inserting into Room")
-
-            dao.insertMovies(movies)
+            database.withTransaction {
+                if (loadType == LoadType.REFRESH) {
+                    dao.clearGenre(genreId)
+                }
+                dao.insertMovies(movies)
+            }
 
             println("Inserted successfully")
             println("ROOM COUNT = ${dao.countMovies()}")
@@ -73,6 +78,7 @@ class MovieRemoteMediator(
         } catch (e: Exception) {
 
             println("REMOTE MEDIATOR ERROR = ${e.message}")
+            e.printStackTrace()
 
             MediatorResult.Error(e)
         }

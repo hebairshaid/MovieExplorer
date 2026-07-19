@@ -70,7 +70,7 @@ class SignUpViewModel @Inject constructor(
 
     fun signUp() {
 
-        if (password != confirmPassword) {
+        if (_password.value != _confirmPassword.value) {
             _state.value = SignUpUiState.Error("Passwords do not match")
             return
         }
