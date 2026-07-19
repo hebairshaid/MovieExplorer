@@ -14,4 +14,11 @@ interface MovieApi {
         @Query("page") page: Int,
         @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY
     ): MovieResponseDto
+
+    @GET("search/movie")
+    suspend fun searchMovies(
+        @Query("query") query: String,
+        @Query("page") page: Int = 1,
+        @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY
+    ): MovieResponseDto
 }

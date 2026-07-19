@@ -5,6 +5,8 @@ import com.movieexplorer.home_screen.data.local.MovieDatabase
 import com.movieexplorer.home_screen.data.remote.MovieApi
 import com.movieexplorer.home_screen.data.repository.MovieRepositoryImpl
 import com.movieexplorer.home_screen.domain.repository.MovieRepository
+import com.movieexplorer.search_screen.data.repository.SearchRepositoryImpl
+import com.movieexplorer.search_screen.domain.repository.SearchRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +25,13 @@ object RepositoryModule {
         database: MovieDatabase
     ): MovieRepository {
         return MovieRepositoryImpl(api, dao, database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchRepository(
+        api: MovieApi
+    ): SearchRepository {
+        return SearchRepositoryImpl(api)
     }
 }

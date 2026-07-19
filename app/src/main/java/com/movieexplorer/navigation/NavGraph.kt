@@ -20,6 +20,8 @@ import com.movieexplorer.home_screen.presentation.home.MovieScreen
 import com.movieexplorer.movie_details.presentation.MovieDetailsScreen
 import com.movieexplorer.movie_details.presentation.MovieDetailsViewModel
 
+import com.movieexplorer.search_screen.presentation.SearchScreen
+
 import com.movieexplorer.splash_screen.SplashScreenUI
 import com.movieexplorer.splash_screen.SplashViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,6 +75,11 @@ navController: NavHostController
                     }
                 }
             )
+        }
+
+        // 🔵 SEARCH
+        composable(Screen.Search) {
+            SearchScreen(navController = navController)
         }
 
         // 🔵 SIGNUP

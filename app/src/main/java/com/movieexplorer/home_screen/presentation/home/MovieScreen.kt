@@ -38,7 +38,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.movieexplorer.navigation.Screen
 
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -153,6 +155,14 @@ fun MovieScreen(
             )
 
             Spacer(modifier = Modifier.weight(1f))
+
+            IconButton(onClick = { navController.navigate(Screen.Search) }) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Gold
+                )
+            }
 
             Box {
 
