@@ -28,7 +28,9 @@ import androidx.compose.ui.layout.ContentScale
 fun MovieCard(
     movie: Movie,
     genre: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (() -> Unit)? = null
 ) {
 
     Card(
@@ -36,11 +38,7 @@ fun MovieCard(
             .fillMaxWidth()
             .padding(horizontal = 14.dp, vertical = 6.dp)
             .clickable {
-
-
-                // ✅ HERE IS THE CORRECT PLACE
                 println("🔥 CLICKED MOVIE ID = ${movie.id}")
-
                 onClick()
             },
         colors = CardDefaults.cardColors(
@@ -87,13 +85,28 @@ fun MovieCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
-                Text(
-                    text = movie.title,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = movie.title,
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    if (onFavoriteClick != null) {
+                        FavoriteHeartButton(
+                            isFavorite = isFavorite,
+                            onClick = onFavoriteClick,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 

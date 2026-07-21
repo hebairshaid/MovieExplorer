@@ -7,6 +7,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.movieexplorer.movie_details.domain.usecase.GetMovieDetailsUseCase
+import com.movieexplorer.home_screen.domain.model.Movie
+import com.movieexplorer.watchlist_screen.domain.usecase.AddToWatchlistUseCase
+import com.movieexplorer.watchlist_screen.domain.usecase.IsInWatchlistUseCase
+import com.movieexplorer.watchlist_screen.domain.usecase.RemoveFromWatchlistUseCase
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,7 +21,10 @@ import kotlinx.coroutines.flow.asStateFlow
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     private val useCase: GetMovieDetailsUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val isInWatchlistUseCase: IsInWatchlistUseCase,
+    private val addToWatchlistUseCase: AddToWatchlistUseCase,
+    private val removeFromWatchlistUseCase: RemoveFromWatchlistUseCase
 ) : ViewModel() {
 
     private val movieId: Int = savedStateHandle["movieId"] ?: 0 //It is a container that holds navigation arguments
@@ -29,6 +36,9 @@ class MovieDetailsViewModel @Inject constructor(
         private set*/
     private val _state = MutableStateFlow<MovieDetailsUiState>(MovieDetailsUiState.Loading)
     val state: StateFlow<MovieDetailsUiState> = _state.asStateFlow()
+
+    private val _isInWatchlist = MutableStateFlow(false)
+    val isInWatchlist: StateFlow<Boolean> = _isInWatchlist.asStateFlow()
 
     init {
         // Runs automatically when the ViewModel is created.
@@ -59,6 +69,9 @@ class MovieDetailsViewModel @Inject constructor(
 
                 _state.value = MovieDetailsUiState.Success(movie)
 
+                // Update watchlist button state after we have the movieId.
+                _isInWatchlist.value = isInWatchlistUseCase(movieId)
+
                 /* state = state.copy(
                      isLoading = false,
                      movie = movie,
@@ -79,6 +92,21 @@ class MovieDetailsViewModel @Inject constructor(
                     movie = null,
                     error = e.message
                 )*/
+            }
+        }
+    }
+
+    fun toggleWatchlist(movie: Movie) {
+        viewModelScope.launch {
+            try {
+                if (_isInWatchlist.value) {
+                    removeFromWatchlistUseCase(movie.id)
+                } else {
+                    addToWatchlistUseCase(movie)
+                }
+                _isInWatchlist.value = isInWatchlistUseCase(movie.id)
+            } catch (e: Exception) {
+                println("Watchlist toggle failed: ${e.message}")
             }
         }
     }

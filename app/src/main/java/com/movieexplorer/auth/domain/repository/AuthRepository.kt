@@ -14,6 +14,14 @@ interface AuthRepository { //define what app must do not how to do
     ): AuthResponse
 
     suspend fun isEmailExists(email: String): Boolean
+
+    suspend fun getUserByEmail(email: String): User?
+
+    suspend fun updatePassword(
+        email: String,
+        currentPassword: String,
+        newPassword: String
+    )
 }
 /*
 interface=what should be done  define the action what function must be exist

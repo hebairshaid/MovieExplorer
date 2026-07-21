@@ -2,10 +2,12 @@ package com.movieexplorer.home_screen.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.movieexplorer.watchlist_screen.data.local.WatchlistMovieEntity
+import com.movieexplorer.watchlist_screen.data.local.WatchlistDao
 
 @Database(
-    entities = [CachedMovieEntity::class], //entities This is a list of all the tables in this database ,why :: class Pass the class itself
-    version = 2,  //you first create the database when you add column later it change to 2
+    entities = [CachedMovieEntity::class, WatchlistMovieEntity::class], //separate offline cache + watchlist table
+    version = 5,
     exportSchema = false
     /*exportSchema = false Room can generate a file describing your database schema.
     This is useful in large teams because developers can track database changes over time.
@@ -14,6 +16,7 @@ import androidx.room.RoomDatabase
 abstract class MovieDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
+    abstract fun watchlistDao(): WatchlistDao
 }
 /*
 Why is the class abstract?

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MovieExplorer" parent="Theme.Material3.DayNight" />
+    <style name="Theme.MovieExplorer" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#071236</item>
+        <item name="android:navigationBarColor">#071236</item>
+        <item name="android:windowBackground">#071236</item>
+        <item name="android:colorBackground">#071236</item>
+    </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="android:windowBackground">#030B2C</item>

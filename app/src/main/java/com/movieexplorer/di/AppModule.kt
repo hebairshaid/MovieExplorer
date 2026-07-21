@@ -38,7 +38,9 @@ object AppModule { //Why object and not class? Because Only one AppModule is nee
             context,
             AppDatabase::class.java,
             "movie_db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     // 🟦 DAO

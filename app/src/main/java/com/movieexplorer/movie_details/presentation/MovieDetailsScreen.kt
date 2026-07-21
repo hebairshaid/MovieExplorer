@@ -3,6 +3,8 @@ package com.movieexplorer.movie_details.presentation
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,6 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.movieexplorer.home_screen.presentation.home.FavoriteHeartButton
+import com.movieexplorer.home_screen.util.toPosterUrl
 import com.movieexplorer.ui.theme.Gold
 
 @Composable
@@ -40,6 +44,7 @@ fun MovieDetailsScreen(
 
    // val state = viewModel.state
     val state = viewModel.state.collectAsStateWithLifecycle().value
+    val isInWatchlist = viewModel.isInWatchlist.collectAsStateWithLifecycle().value
 
     Box(
         modifier = Modifier
@@ -85,7 +90,7 @@ fun MovieDetailsScreen(
 
                     // Poster Image
                     AsyncImage(
-                        model = "https://image.tmdb.org/t/p/w500${movie.posterUrl}",
+                        model = movie.posterUrl.toPosterUrl(),
                         contentDescription = movie.title,
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -117,25 +122,34 @@ fun MovieDetailsScreen(
                         // Back Button
                         val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-                        IconButton(
-                            onClick = {
-                                backDispatcher?.onBackPressed()
-                            },
+                        Box(
                             modifier = Modifier
-                                .padding(
-                                    start = 20.dp,
-                                    top = 40.dp
-                                )
-                                .size(52.dp)
-                                .background(
-                                    Color(0x55000000),
-                                    CircleShape
-                                )
+                                .fillMaxWidth()
+                                .padding(top = 40.dp, start = 20.dp, end = 20.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color.White
+                            IconButton(
+                                onClick = {
+                                    backDispatcher?.onBackPressed()
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .size(52.dp)
+                                    .background(
+                                        Color(0x55000000),
+                                        CircleShape
+                                    )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = Color.White
+                                )
+                            }
+
+                            FavoriteHeartButton(
+                                isFavorite = isInWatchlist,
+                                onClick = { viewModel.toggleWatchlist(movie) },
+                                modifier = Modifier.align(Alignment.CenterEnd)
                             )
                         }
 

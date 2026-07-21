@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.movieexplorer.home_screen.data.local.MovieDatabase
 import com.movieexplorer.home_screen.data.local.MovieDao
+import com.movieexplorer.watchlist_screen.data.local.WatchlistDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,6 +34,13 @@ object DatabaseModule {
         database: MovieDatabase
     ): MovieDao {
         return database.movieDao()
+    }
+
+    @Provides
+    fun provideWatchlistDao(
+        database: MovieDatabase
+    ): WatchlistDao {
+        return database.watchlistDao()
     }
 }
 /*

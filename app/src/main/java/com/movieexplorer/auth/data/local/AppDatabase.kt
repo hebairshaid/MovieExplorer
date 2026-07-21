@@ -6,7 +6,8 @@ import com.movieexplorer.auth.data.local.UserEntity
 
 @Database(
     entities = [UserEntity::class],
-    version = 1
+    version = 2,
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 

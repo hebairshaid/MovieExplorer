@@ -7,6 +7,8 @@ object Screen {
     const val SignUp = "signup"
     const val Home = "home"
     const val Search = "search"
+    const val Profile = "profile"
+    const val Watchlist = "watchlist"
 
     const val MovieDetails = "movie_details/{movieId}"
 

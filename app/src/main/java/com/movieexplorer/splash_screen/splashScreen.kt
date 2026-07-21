@@ -73,7 +73,7 @@ fun SplashScreenUI(
         ){
             LottieAnimation(
                 composition = composition,
-                progress = progress,
+                progress = { progress },
                 dynamicProperties = dynamicProperties,
                 modifier = Modifier.size(200.dp)
             )

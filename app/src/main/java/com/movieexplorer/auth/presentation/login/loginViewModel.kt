@@ -44,6 +44,9 @@ class LoginViewModel @Inject constructor( // before You manually called the cons
     }*/
     fun onEmailChange(value: String) { //value comes from the UI (Compose TextField)
         _email.value = value
+        if (_state.value is LoginUiState.Error) {
+            _state.value = LoginUiState.Idle
+        }
     }
 
    /* fun onPasswordChange(value: String) {
@@ -51,7 +54,16 @@ class LoginViewModel @Inject constructor( // before You manually called the cons
     }*/
    fun onPasswordChange(value: String) {
        _password.value = value
+       if (_state.value is LoginUiState.Error) {
+           _state.value = LoginUiState.Idle
+       }
    }
+
+    fun clearError() {
+        if (_state.value is LoginUiState.Error) {
+            _state.value = LoginUiState.Idle
+        }
+    }
 
     fun login() {
 
@@ -61,8 +73,8 @@ class LoginViewModel @Inject constructor( // before You manually called the cons
 
             try {
                 val user = loginUseCase(
-                    _email.value,       //extract value
-                    _password.value
+                    _email.value.trim(),
+                    _password.value.trim()
                 )
 
                 _state.value = LoginUiState.Success(

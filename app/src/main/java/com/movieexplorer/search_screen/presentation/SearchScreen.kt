@@ -46,6 +46,7 @@ fun SearchScreen(
 ) {
     val query by viewModel.query.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val favoriteIds = viewModel.favoriteIds.collectAsStateWithLifecycle().value
 
     Column(
         modifier = Modifier
@@ -146,6 +147,8 @@ fun SearchScreen(
                         MovieCard(
                             movie = movie,
                             genre = movie.releaseDate.take(4).ifBlank { "Movie" },
+                            isFavorite = favoriteIds.contains(movie.id),
+                            onFavoriteClick = { viewModel.toggleFavorite(movie) },
                             onClick = {
                                 navController.navigate(Screen.movieDetailsScreen(movie.id))
                             }

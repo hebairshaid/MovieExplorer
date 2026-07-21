@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.movieexplorer.auth.presentation.signup.SignUpUiState
+import com.movieexplorer.ui.components.PasswordTextField
 import com.movieexplorer.ui.theme.Gold
 
 @Composable
@@ -136,12 +137,10 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            TextField(
-               // value = state.password,
+            PasswordTextField(
                 value = password,
                 onValueChange = viewModel::onPasswordChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter password") }
+                label = "Enter password"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -150,13 +149,10 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-
-            TextField(
-                //value = state.confirmPassword,
+            PasswordTextField(
                 value = confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Confirm Password") }
+                label = "Confirm Password"
             )
 
             Spacer(modifier = Modifier.height(30.dp))

@@ -2,10 +2,15 @@ package com.movieexplorer.search_screen.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.movieexplorer.home_screen.domain.model.Movie
 import com.movieexplorer.search_screen.domain.usecase.SearchMoviesUseCase
+import com.movieexplorer.watchlist_screen.domain.usecase.AddToWatchlistUseCase
+import com.movieexplorer.watchlist_screen.domain.usecase.ObserveWatchlistUseCase
+import com.movieexplorer.watchlist_screen.domain.usecase.RemoveFromWatchlistUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -14,14 +19,20 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchMoviesUseCase: SearchMoviesUseCase
+    private val searchMoviesUseCase: SearchMoviesUseCase,
+    observeWatchlistUseCase: ObserveWatchlistUseCase,
+    private val addToWatchlistUseCase: AddToWatchlistUseCase,
+    private val removeFromWatchlistUseCase: RemoveFromWatchlistUseCase
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -29,6 +40,14 @@ class SearchViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+
+    val favoriteIds: StateFlow<Set<Int>> = observeWatchlistUseCase()
+        .map { movies -> movies.map { it.id }.toSet() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptySet()
+        )
 
     init {
         _query
@@ -66,5 +85,19 @@ class SearchViewModel @Inject constructor(
     fun clearQuery() {
         _query.value = ""
         _uiState.value = SearchUiState.Idle
+    }
+
+    fun toggleFavorite(movie: Movie) {
+        viewModelScope.launch {
+            try {
+                if (favoriteIds.value.contains(movie.id)) {
+                    removeFromWatchlistUseCase(movie.id)
+                } else {
+                    addToWatchlistUseCase(movie)
+                }
+            } catch (e: Exception) {
+                println("Favorite toggle failed: ${e.message}")
+            }
+        }
     }
 }

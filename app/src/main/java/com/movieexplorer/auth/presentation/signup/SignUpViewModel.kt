@@ -84,7 +84,7 @@ class SignUpViewModel @Inject constructor(
                     User(
                         name = _name.value.trim(),
                         email = _email.value.trim().lowercase(),
-                        password = _password.value
+                        password = _password.value.trim()
                     )
                 )
 
