@@ -2,14 +2,12 @@ package com.movieexplorer.profile_screen.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.movieexplorer.auth.domain.usecase.GetUserByEmailUseCase
+import com.movieexplorer.auth.domain.usecase.GetCurrentUserUseCase
 import com.movieexplorer.auth.domain.usecase.UpdatePasswordUseCase
-import com.movieexplorer.authentication.domain.use_case.CheckSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,8 +22,7 @@ sealed interface ProfileUiState {
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val checkSessionUseCase: CheckSessionUseCase,
-    private val getUserByEmailUseCase: GetUserByEmailUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updatePasswordUseCase: UpdatePasswordUseCase
 ) : ViewModel() {
 
@@ -53,25 +50,12 @@ class ProfileViewModel @Inject constructor(
     private fun loadProfile() {
         viewModelScope.launch {
             try {
-                val token = checkSessionUseCase().first()
-                val email = token
-                    ?.removePrefix("local_token_")
-                    ?.trim()
-                    ?.lowercase()
-                    .orEmpty()
-
-                if (email.isBlank()) {
+                val user = getCurrentUserUseCase()
+                if (user == null) {
                     _uiState.value = ProfileUiState.Error("Not logged in")
                     return@launch
                 }
-
-                currentEmail = email
-                val user = getUserByEmailUseCase(email)
-                if (user == null) {
-                    _uiState.value = ProfileUiState.Error("User not found")
-                    return@launch
-                }
-
+                currentEmail = user.email
                 _uiState.value = ProfileUiState.Ready(
                     name = user.name,
                     email = user.email

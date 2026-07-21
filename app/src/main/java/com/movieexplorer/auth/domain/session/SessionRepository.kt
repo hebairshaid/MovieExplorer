@@ -7,4 +7,3 @@ interface SessionRepository {
     suspend fun saveToken(token: String)
     suspend fun clearSession()
 }
-// where it used in sessionManger and dataStore

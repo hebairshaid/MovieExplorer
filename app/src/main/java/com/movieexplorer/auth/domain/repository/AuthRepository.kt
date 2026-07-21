@@ -1,17 +1,12 @@
-package com.movieexplorer.authentication.domain.repository
+package com.movieexplorer.auth.domain.repository
 
-import com.movieexplorer.auth.data.local.AuthResponse
-import com.movieexplorer.authentication.domain.model.User
-import javax.inject.Inject
+import com.movieexplorer.auth.domain.model.AuthResponse
+import com.movieexplorer.auth.domain.model.User
 
-interface AuthRepository { //define what app must do not how to do
-                           //any class that implements it MUST follow these rules
+interface AuthRepository {
     suspend fun signUp(user: User)
 
-    suspend fun login(
-        email: String,
-        password: String
-    ): AuthResponse
+    suspend fun login(email: String, password: String): AuthResponse
 
     suspend fun isEmailExists(email: String): Boolean
 
@@ -23,7 +18,3 @@ interface AuthRepository { //define what app must do not how to do
         newPassword: String
     )
 }
-/*
-interface=what should be done  define the action what function must be exist
-implementation= how it is done implements the real logic
-* */

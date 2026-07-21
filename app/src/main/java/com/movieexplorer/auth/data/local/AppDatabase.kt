@@ -1,8 +1,7 @@
-package com.movieexplorer.authentication.data.local
+package com.movieexplorer.auth.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.movieexplorer.auth.data.local.UserEntity
 
 @Database(
     entities = [UserEntity::class],
@@ -10,6 +9,5 @@ import com.movieexplorer.auth.data.local.UserEntity
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-
     abstract fun userDao(): UserDao
 }

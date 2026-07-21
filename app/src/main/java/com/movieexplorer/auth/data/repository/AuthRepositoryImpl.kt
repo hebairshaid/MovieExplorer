@@ -1,11 +1,12 @@
-package com.movieexplorer.authentication.data.repository
+package com.movieexplorer.auth.data.repository
 
-import com.movieexplorer.auth.data.local.AuthResponse
 import com.movieexplorer.auth.data.local.UserEntity
+import com.movieexplorer.auth.data.local.UserDao
+import com.movieexplorer.auth.domain.model.AuthResponse
+import com.movieexplorer.auth.domain.model.User
+import com.movieexplorer.auth.domain.repository.AuthRepository
 import com.movieexplorer.auth.domain.security.PasswordHasher
-import com.movieexplorer.authentication.data.local.UserDao
-import com.movieexplorer.authentication.domain.model.User
-import com.movieexplorer.authentication.domain.repository.AuthRepository
+import com.movieexplorer.auth.domain.session.SessionToken
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -14,17 +15,15 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     override suspend fun signUp(user: User) {
-
         val cleanEmail = user.email.trim().lowercase()
-
-        val hashedUser = user.copy(  //user.copy() → creates a NEW User object (does NOT change original)
+        val hashedUser = user.copy(
             email = cleanEmail,
-            password = passwordHasher.hash(user.password) //passwordHasher.hash(...) → converts password into a secure hashed version
-        )//Take the user and replace their password with a hashed version
+            password = passwordHasher.hash(user.password.trim())
+        )
 
         dao.insertUser(
             UserEntity(
-                name = hashedUser.name,
+                name = hashedUser.name.trim(),
                 email = hashedUser.email,
                 password = hashedUser.password
             )
@@ -32,16 +31,13 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun login(email: String, password: String): AuthResponse {
-
         val cleanEmail = email.trim().lowercase()
         val cleanPassword = password.trim()
 
         val user = dao.getUserByEmail(cleanEmail)
             ?: throw Exception("Invalid credentials")
 
-        val isPasswordCorrect = passwordHasher.verify(cleanPassword, user.password)
-
-        if (!isPasswordCorrect) {
+        if (!passwordHasher.verify(cleanPassword, user.password)) {
             throw Exception("Invalid credentials")
         }
 
@@ -51,35 +47,16 @@ class AuthRepositoryImpl @Inject constructor(
                 email = user.email,
                 password = user.password
             ),
-            token = "local_token_${user.email}"
+            token = SessionToken.create(user.email)
         )
     }
 
-    /*
-passwordHasher.verify(...)
-
-This function:
-
-✔ takes the raw password
-✔ hashes it internally
-✔ compares it with stored hash
-
-So internally it does something like:
-
-hash(inputPassword) == storedHashedPassword
-
-BUT safely (because real hash libraries don’t just compare strings).
-*/
-
-
-    override suspend fun isEmailExists(email: String): Boolean {  //check email exist used in signup to preventing duplicate accounts
-        val cleanEmail = email.trim().lowercase()
-        return dao.getUserByEmail(cleanEmail) != null
+    override suspend fun isEmailExists(email: String): Boolean {
+        return dao.getUserByEmail(email.trim().lowercase()) != null
     }
 
     override suspend fun getUserByEmail(email: String): User? {
-        val cleanEmail = email.trim().lowercase()
-        val entity = dao.getUserByEmail(cleanEmail) ?: return null
+        val entity = dao.getUserByEmail(email.trim().lowercase()) ?: return null
         return User(
             name = entity.name,
             email = entity.email,
@@ -103,21 +80,7 @@ BUT safely (because real hash libraries don’t just compare strings).
             throw Exception("Current password is incorrect")
         }
 
-        if (cleanNew.length < 6) {
-            throw Exception("Password must be at least 6 characters")
-        }
-
-        if (!cleanNew.any { it.isUpperCase() }) {
-            throw Exception("Password must contain a capital letter")
-        }
-
-        if (!cleanNew.any { !it.isLetterOrDigit() }) {
-            throw Exception("Password must contain a special character")
-        }
-
         val hashed = passwordHasher.hash(cleanNew)
-
-        // Update by id and by email so every matching row stays in sync
         val byId = dao.updatePasswordById(userId = user.id, hashedPassword = hashed)
         val byEmail = dao.updatePasswordByEmail(email = cleanEmail, hashedPassword = hashed)
 
@@ -125,7 +88,6 @@ BUT safely (because real hash libraries don’t just compare strings).
             throw Exception("Failed to update password")
         }
 
-        // Confirm the new password can log in before telling the user it succeeded
         val refreshed = dao.getUserByEmail(cleanEmail)
             ?: throw Exception("Failed to update password")
 

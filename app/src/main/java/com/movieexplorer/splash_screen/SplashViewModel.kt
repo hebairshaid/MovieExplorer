@@ -1,13 +1,13 @@
 package com.movieexplorer.splash_screen
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.movieexplorer.authentication.domain.use_case.CheckSessionUseCase
-import kotlinx.coroutines.launch
+import com.movieexplorer.auth.domain.usecase.CheckSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,17 +15,17 @@ class SplashViewModel @Inject constructor(
     private val checkSessionUseCase: CheckSessionUseCase
 ) : ViewModel() {
 
-    var isLoggedIn by mutableStateOf<Boolean?>(null) //Boolean? mean true false null ,null mean I don't know yet because the session check hasn't finished
-        private set
+    private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
+    val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
 
-    init { //What is init? init runs automatically when the object is created Immediately constructor runs init runs
-        checkSession() //runs automatically when SplashViewModel is created
+    init {
+        checkSession()
     }
 
-    private fun checkSession() {  //why private? Only SplashViewModel should use it
-        viewModelScope.launch {  //why? Because checkSessionUseCase() returns a Flow ,Flows are collected inside coroutines
-            checkSessionUseCase.invoke().collect { token -> // .collect{token -> mean Listen for values from the Flow
-                isLoggedIn = !token.isNullOrEmpty() //return true token is missing return false token exists
+    private fun checkSession() {
+        viewModelScope.launch {
+            checkSessionUseCase().collect { token ->
+                _isLoggedIn.value = !token.isNullOrEmpty()
             }
         }
     }

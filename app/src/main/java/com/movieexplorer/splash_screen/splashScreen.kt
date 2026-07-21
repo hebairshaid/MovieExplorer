@@ -1,10 +1,17 @@
 package com.movieexplorer.splash_screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,21 +19,25 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.compose.*
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import com.movieexplorer.R
 import com.movieexplorer.ui.theme.Gold
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenUI(
-    //viewModel: SplashViewModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
-
     val viewModel: SplashViewModel = hiltViewModel()
-    val state = viewModel.isLoggedIn
+    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
 
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.splash)
@@ -46,15 +57,12 @@ fun SplashScreenUI(
         )
     )
 
-
-
-    // 🚀 NAVIGATION LOGIC
-    LaunchedEffect(state) {
+    LaunchedEffect(isLoggedIn) {
         delay(3000)
-        if (state == true) {
-            onNavigateToHome()
-        } else if (state == false) {
-            onNavigateToLogin()
+        when (isLoggedIn) {
+            true -> onNavigateToHome()
+            false -> onNavigateToLogin()
+            null -> Unit
         }
     }
 
@@ -66,11 +74,10 @@ fun SplashScreenUI(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ) {
-
-        Box (
+        Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
-        ){
+        ) {
             LottieAnimation(
                 composition = composition,
                 progress = { progress },
@@ -78,15 +85,15 @@ fun SplashScreenUI(
                 modifier = Modifier.size(200.dp)
             )
         }
-        Box (
+        Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
-        ){
-        Text(
-            text = "Movie Explorer",
-            color = Gold,
-            fontSize = 25.sp
-        )
-    }
+        ) {
+            Text(
+                text = "Movie Explorer",
+                color = Gold,
+                fontSize = 25.sp
+            )
+        }
     }
 }

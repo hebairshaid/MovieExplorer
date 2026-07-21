@@ -16,8 +16,6 @@ class MovieDetailRepositoryImpl @Inject constructor(
 ) : MovieDetailRepository {
 
     override suspend fun getMovieDetails(movieId: Int): Movie {
-        // Prefer fresh details from API (runtime + correct poster path).
-        // Use Room only as offline fallback.
         return try {
             val movie = api.getMovieDetails(
                 movieId,
@@ -27,8 +25,8 @@ class MovieDetailRepositoryImpl @Inject constructor(
             dao.insertMovies(listOf(movie.toEntity(genreId = 0)))
             movie
         } catch (e: Exception) {
-            val fallback = dao.getMovieById(movieId)?.toMovie()
-            fallback ?: throw Exception(e.message ?: "No internet & no cached data")
+            dao.getMovieById(movieId)?.toMovie()
+                ?: throw Exception(e.message ?: "No internet & no cached data")
         }
     }
 }

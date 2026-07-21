@@ -1,6 +1,7 @@
 package com.movieexplorer.watchlist_screen.data.repository
 
 import com.movieexplorer.auth.domain.session.SessionRepository
+import com.movieexplorer.auth.domain.session.SessionToken
 import com.movieexplorer.home_screen.domain.model.Movie
 import com.movieexplorer.watchlist_screen.data.local.WatchlistDao
 import com.movieexplorer.watchlist_screen.data.mapper.toMovie
@@ -22,7 +23,7 @@ class WatchlistRepositoryImpl @Inject constructor(
 
     override fun observeWatchlist(): Flow<List<Movie>> {
         return sessionRepository.getToken().flatMapLatest { token ->
-            val email = emailFromToken(token)
+            val email = SessionToken.emailFrom(token)
             if (email.isBlank()) {
                 flowOf(emptyList())
             } else {
@@ -49,18 +50,10 @@ class WatchlistRepositoryImpl @Inject constructor(
     }
 
     private suspend fun requireUserEmail(): String {
-        val email = emailFromToken(sessionRepository.getToken().first())
+        val email = SessionToken.emailFrom(sessionRepository.getToken().first())
         if (email.isBlank()) {
             throw Exception("Not logged in")
         }
         return email
-    }
-
-    private fun emailFromToken(token: String?): String {
-        return token
-            ?.removePrefix("local_token_")
-            ?.trim()
-            ?.lowercase()
-            .orEmpty()
     }
 }

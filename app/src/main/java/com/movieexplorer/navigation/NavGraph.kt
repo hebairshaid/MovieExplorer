@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
 import com.movieexplorer.auth.presentation.login.LoginScreen
-import com.movieexplorer.authentication.presentation.signup.SignUpScreen
+import com.movieexplorer.auth.presentation.signup.SignUpScreen
 import com.movieexplorer.home_screen.presentation.home.MovieScreen
 import com.movieexplorer.movie_details.presentation.MovieDetailsScreen
 import com.movieexplorer.profile_screen.presentation.ProfileScreen

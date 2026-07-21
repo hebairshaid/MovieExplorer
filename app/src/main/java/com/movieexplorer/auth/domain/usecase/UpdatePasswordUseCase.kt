@@ -1,6 +1,7 @@
 package com.movieexplorer.auth.domain.usecase
 
-import com.movieexplorer.authentication.domain.repository.AuthRepository
+import com.movieexplorer.auth.domain.model.PasswordPolicy
+import com.movieexplorer.auth.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class UpdatePasswordUseCase @Inject constructor(
@@ -12,9 +13,11 @@ class UpdatePasswordUseCase @Inject constructor(
         newPassword: String,
         confirmPassword: String
     ) {
-        if (newPassword.trim() != confirmPassword.trim()) {
+        val cleanNew = newPassword.trim()
+        if (cleanNew != confirmPassword.trim()) {
             throw Exception("Passwords do not match")
         }
-        repository.updatePassword(email, currentPassword, newPassword)
+        PasswordPolicy.validate(cleanNew)
+        repository.updatePassword(email, currentPassword, cleanNew)
     }
 }

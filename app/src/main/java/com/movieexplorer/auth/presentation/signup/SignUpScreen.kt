@@ -1,4 +1,4 @@
-package com.movieexplorer.authentication.presentation.signup
+package com.movieexplorer.auth.presentation.signup
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background

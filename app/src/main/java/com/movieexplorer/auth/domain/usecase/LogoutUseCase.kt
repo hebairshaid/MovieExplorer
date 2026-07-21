@@ -10,4 +10,3 @@ class LogoutUseCase @Inject constructor(
         sessionRepository.clearSession()
     }
 }
-//removes the user’s login session by clearing the stored token

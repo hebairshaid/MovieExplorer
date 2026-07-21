@@ -1,10 +1,9 @@
-package com.movieexplorer.authentication.data.local
+package com.movieexplorer.auth.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.movieexplorer.auth.data.local.UserEntity
 
 @Dao
 interface UserDao {
